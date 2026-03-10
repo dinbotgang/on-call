@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elevate Soccer — Club Partnership Deck</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #00C853;
+      --green-dark: #009940;
+      --green-glow: rgba(0,200,83,0.12);
+      --dark: #080C10;
+      --dark2: #0E1318;
+      --card: #111820;
+      --border: rgba(255,255,255,0.08);
+      --text: #E8EDF2;
+      --muted: #6B7A8D;
+      --gold: #FFB400;
+      --gold-glow: rgba(255,180,0,0.1);
+    }
+
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); }
+
+    .deck { width: 100vw; height: 100vh; position: relative; }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 8%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      transform: translateX(40px);
+      overflow: hidden;
+    }
+    .slide.active { opacity: 1; pointer-events: all; transform: translateX(0); }
+    .slide.exit { opacity: 0; transform: translateX(-40px); }
+
+    .bg-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+      opacity: 0.35; pointer-events: none;
+    }
+    .bg-glow { position: absolute; pointer-events: none; border-radius: 50%; }
+    .bg-glow.tr { top: -120px; right: -120px; width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,200,83,0.09) 0%, transparent 70%); }
+    .bg-glow.bl { bottom: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,200,83,0.06) 0%, transparent 70%); }
+    .bg-glow.gold { top: -80px; right: -80px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,180,0,0.07) 0%, transparent 70%); }
+
+    /* NAV */
+    .nav-bar {
+      position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
+      z-index: 99; display: flex; align-items: center; gap: 20px;
+      background: rgba(14,19,24,0.9); backdrop-filter: blur(16px);
+      border: 1px solid var(--border); border-radius: 100px; padding: 12px 24px;
+    }
+    .nav-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--card); color: var(--text); font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .nav-btn:hover { background: var(--green); color: #000; border-color: var(--green); }
+    .slide-counter { font-size: 0.8rem; font-weight: 600; color: var(--muted); min-width: 52px; text-align: center; }
+    .slide-counter span { color: var(--green); }
+    .nav-dots { display: flex; gap: 6px; align-items: center; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .dot.active { background: var(--green); width: 18px; border-radius: 3px; }
+
+    .slide-logo {
+      position: absolute; top: 28px; left: 8%;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 2px; color: rgba(255,255,255,0.3);
+    }
+    .slide-logo span { color: var(--green); }
+    .slide-tag { position: absolute; top: 28px; right: 8%; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--green); }
+    .key-hint { position: fixed; top: 28px; right: 8%; font-size: 0.72rem; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+    .key { background: var(--card); border: 1px solid var(--border); padding: 3px 8px; border-radius: 5px; font-size: 0.7rem; }
+
+    /* TYPOGRAPHY */
+    .label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px; color: var(--green); margin-bottom: 16px; }
+    .h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.2rem, 7vw, 6rem); line-height: 1; letter-spacing: 1px; color: #fff; }
+    .h1 .accent { color: var(--green); }
+    .h1 .gold { color: var(--gold); }
+    .h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem, 4.5vw, 3.6rem); line-height: 1.05; letter-spacing: 0.5px; color: #fff; margin-bottom: 20px; }
+    .subtitle { font-size: clamp(0.95rem, 1.6vw, 1.1rem); color: var(--muted); line-height: 1.75; max-width: 620px; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green-glow); border: 1px solid rgba(0,200,83,0.3);
+      color: var(--green); padding: 7px 18px; border-radius: 100px;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 24px; width: fit-content;
+    }
+    .badge.gold-badge { background: var(--gold-glow); border-color: rgba(255,180,0,0.3); color: var(--gold); }
+
+    /* LAYOUT */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+    .four-col { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+    .two-col-wide { display: grid; grid-template-columns: 1.4fr 1fr; gap: 48px; align-items: start; }
+
+    /* CARDS */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; }
+    .card.green-border { border-color: rgba(0,200,83,0.35); }
+    .card.gold-border { border-color: rgba(255,180,0,0.35); }
+    .card-icon { font-size: 1.8rem; margin-bottom: 14px; }
+    .card h4 { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .card p { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+
+    /* STATS */
+    .stat-block { text-align: center; }
+    .stat-block .num { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.4rem, 4.5vw, 3.8rem); color: var(--green); line-height: 1; }
+    .stat-block .num.gold { color: var(--gold); }
+    .stat-block .desc { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 6px; }
+
+    /* LIST */
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .check-list li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.9rem; color: var(--text); }
+    .check-list li::before { content: '✓'; color: var(--green); font-weight: 700; font-size: 0.85rem; margin-top: 2px; min-width: 16px; }
+    .check-list.gold-checks li::before { color: var(--gold); }
+
+    /* TABLE */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .data-table td { font-size: 0.88rem; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table .green { color: var(--green); font-weight: 700; }
+    .data-table .gold { color: var(--gold); font-weight: 700; }
+    .data-table .highlight td { background: rgba(0,200,83,0.06); }
+    .data-table .gold-row td { background: rgba(255,180,0,0.06); }
+
+    /* PILL */
+    .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 12px; border-radius: 100px; border: 1px solid rgba(0,200,83,0.25); background: var(--green-glow); color: var(--green); margin-bottom: 8px; }
+    .pill.gold { border-color: rgba(255,180,0,0.25); background: var(--gold-glow); color: var(--gold); }
+
+    /* QUOTE */
+    .quote-block { border-left: 3px solid var(--green); padding: 16px 24px; background: var(--green-glow); border-radius: 0 12px 12px 0; }
+    .quote-block.gold { border-left-color: var(--gold); background: var(--gold-glow); }
+    .quote-block p { font-size: 1rem; color: var(--text); font-style: italic; line-height: 1.7; }
+
+    /* VISUAL PANEL */
+    .visual-panel {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      height: 100%; min-height: 300px; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center; padding: 40px; position: relative; overflow: hidden;
+    }
+    .visual-panel::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,200,83,0.1) 0%, transparent 70%); border-radius: 50%; }
+    .visual-panel.gold-panel::before { background: radial-gradient(circle, rgba(255,180,0,0.1) 0%, transparent 70%); }
+    .visual-panel .big-icon { font-size: 3.5rem; margin-bottom: 16px; }
+    .visual-panel h3 { font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    .visual-panel p { font-size: 0.85rem; color: var(--muted); line-height: 1.65; }
+
+    /* REVENUE SPLIT VISUAL */
+    .rev-split { width: 100%; height: 14px; border-radius: 7px; overflow: hidden; display: flex; margin: 20px 0; }
+    .rev-club { background: var(--gold); transition: width 1s ease; }
+    .rev-us { background: var(--green); transition: width 1s ease; }
+    .rev-labels { display: flex; justify-content: space-between; font-size: 0.78rem; font-weight: 700; }
+
+    /* TIMELINE */
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-item { display: flex; gap: 24px; padding: 18px 0; border-bottom: 1px solid var(--border); }
+    .timeline-item:last-child { border-bottom: none; }
+    .tl-phase { min-width: 100px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green); padding-top: 3px; }
+    .tl-dot { width: 10px; height: 10px; min-width: 10px; background: var(--green); border-radius: 50%; margin-top: 6px; }
+    .tl-content h5 { font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .tl-content p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+    /* BIG NUMBER HIGHLIGHT */
+    .big-num-row { display: flex; gap: 32px; flex-wrap: wrap; margin: 28px 0; }
+    .big-num { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; flex: 1; min-width: 120px; }
+    .big-num .n { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--green); line-height: 1; }
+    .big-num .n.gold { color: var(--gold); }
+    .big-num .d { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+    /* WIN WIN */
+    .win-win { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: center; margin-top: 32px; }
+    .win-col { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; }
+    .win-col.green-border { border-color: rgba(0,200,83,0.35); }
+    .win-col.gold-border { border-color: rgba(255,180,0,0.35); }
+    .win-col h4 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .win-divider { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--muted); text-align: center; }
+
+    /* PROGRESS */
+    .progress-wrap { margin-bottom: 16px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 7px; }
+    .progress-label span:first-child { color: var(--text); font-weight: 600; }
+    .progress-label span:last-child { color: var(--gold); font-weight: 700; }
+    .progress-bar { height: 8px; background: var(--card); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--green)); border-radius: 4px; transition: width 1s ease 0.3s; }
+  </style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- ── SLIDE 1: COVER ── -->
+  <div class="slide active" id="slide-0">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="bg-glow bl"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div>
+      <div class="badge gold-badge">🤝 Club Partnership Proposal</div>
+      <div class="h1">A Partnership That<br>Pays Your Club<br><span class="accent">Every Month.</span></div>
+      <p class="subtitle" style="margin-top:24px;max-width:680px;">Elevate Soccer is a monthly mentorship and recruiting platform for youth soccer athletes. We're looking to partner with select clubs to bring our service to your players — and share the revenue with you for every player enrolled.</p>
+      <div style="display:flex;gap:32px;margin-top:44px;flex-wrap:wrap;">
+        <div class="big-num" style="flex:0;">
+          <div class="n gold">25%</div>
+          <div class="d">Revenue to your club</div>
+        </div>
+        <div class="big-num" style="flex:0;">
+          <div class="n">$45</div>
+          <div class="d">Per player / month</div>
+        </div>
+        <div class="big-num" style="flex:0;">
+          <div class="n gold">$0</div>
+          <div class="d">Cost to your club</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 2: WHO WE ARE ── -->
+  <div class="slide" id="slide-1">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">01 — Who We Are</div>
+    <div class="two-col">
+      <div>
+        <div class="label">Who We Are</div>
+        <div class="h2">Elite Mentorship for<br>Serious Soccer Players.</div>
+        <p class="subtitle" style="margin-bottom:28px;">Elevate Soccer connects youth athletes directly with D1 and professional-level soccer mentors — for $45 a month. We cover athletic development, college recruiting, film analysis, strength programming, and more.</p>
+        <ul class="check-list">
+          <li>Monthly 30-min 1-on-1 call with a pro/D1 mentor</li>
+          <li>Unlimited texting with a 36-hour response guarantee</li>
+          <li>College recruiting strategy &amp; guidance</li>
+          <li>Custom strength &amp; nutrition programs</li>
+          <li>Player profiles with tracked goals &amp; benchmarks</li>
+          <li>Monthly parent updates</li>
+          <li>Film analysis &amp; academic support (add-ons)</li>
+        </ul>
+      </div>
+      <div class="visual-panel">
+        <div class="big-icon">⚽</div>
+        <h3>Online Mentorship, Done Right</h3>
+        <p>We're bringing what the fitness and basketball worlds have already proven — that high-quality remote mentorship drives measurable results — into youth soccer. Every player gets a real mentor, a real plan, and real accountability.</p>
+        <div style="margin-top:24px;display:flex;flex-direction:column;gap:8px;width:100%;text-align:left;">
+          <div class="pill">✓ D1 &amp; Professional mentors</div>
+          <div class="pill">✓ $45/month — accessible for every family</div>
+          <div class="pill">✓ Proven accountability system</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 3: THE OPPORTUNITY ── -->
+  <div class="slide" id="slide-2">
+    <div class="bg-grid"></div>
+    <div class="bg-glow gold"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">02 — The Opportunity</div>
+    <div class="label">The Opportunity</div>
+    <div class="h2">Your Players Already<br>Need This. Now Your Club<br><span style="color:var(--gold);">Gets Paid for It.</span></div>
+    <div class="three-col" style="margin-top:36px;">
+      <div class="card gold-border">
+        <div class="card-icon">💰</div>
+        <h4>A New Revenue Stream</h4>
+        <p>Your club earns 25% of every dollar generated from your enrolled players — with zero operational overhead on your end. We do the work. You get the check.</p>
+      </div>
+      <div class="card green-border">
+        <div class="card-icon">🏆</div>
+        <h4>Elevate Your Players</h4>
+        <p>Your athletes get access to elite mentorship and recruiting guidance they can't get anywhere else at this price. Better players reflect well on your club's brand.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤝</div>
+        <h4>A True Partnership</h4>
+        <p>We're aligned with your club's success. The more your players grow and get recruited, the stronger our shared reputation becomes — and the more families refer others.</p>
+      </div>
+    </div>
+    <div class="quote-block gold" style="margin-top:28px;">
+      <p>"In an ideal world, this becomes a seamless extension of your club's development program — with your branding behind it and revenue flowing back to you automatically."</p>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 4: THE DEAL ── -->
+  <div class="slide" id="slide-3">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">03 — The Deal</div>
+    <div class="label">The Partnership Structure</div>
+    <div class="h2">Simple. Transparent.<br>Profitable for Everyone.</div>
+    <div class="two-col" style="margin-top:32px;align-items:start;">
+      <div>
+        <div class="card gold-border" style="margin-bottom:20px;">
+          <h4 style="margin-bottom:18px;font-size:0.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Revenue Split Per Player</h4>
+          <div class="rev-split" id="revSplit">
+            <div class="rev-club" style="width:25%"></div>
+            <div class="rev-us" style="width:75%"></div>
+          </div>
+          <div class="rev-labels">
+            <span style="color:var(--gold);">⬛ Your Club — 25% ($11.25/player)</span>
+            <span style="color:var(--green);">⬛ Elevate — 75%</span>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>Players Enrolled</th><th>Club Monthly Revenue</th><th>Annual Revenue</th></tr></thead>
+          <tbody>
+            <tr><td>25 players</td><td class="gold">$281</td><td class="gold">$3,375</td></tr>
+            <tr><td>50 players</td><td class="gold">$563</td><td class="gold">$6,750</td></tr>
+            <tr><td>100 players</td><td class="gold">$1,125</td><td class="gold">$13,500</td></tr>
+            <tr class="gold-row"><td><strong>200 players</strong></td><td class="gold"><strong>$2,250</strong></td><td class="gold"><strong>$27,000</strong></td></tr>
+            <tr><td>500 players</td><td class="gold">$5,625</td><td class="gold">$67,500</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.72rem;color:var(--muted);margin-top:10px;">Revenue paid monthly. Based on $45/player/month × 25% club share.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card green-border">
+          <h4>What We Ask of Your Club</h4>
+          <ul class="check-list" style="margin-top:12px;font-size:0.85rem;">
+            <li>Endorse Elevate to your players &amp; families</li>
+            <li>Include us in your monthly club communications</li>
+            <li>Allow us to present to teams (optional)</li>
+            <li>Optionally require enrollment for development teams</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>What You Never Have to Do</h4>
+          <ul class="check-list" style="margin-top:12px;font-size:0.85rem;">
+            <li style="color:var(--muted);">Hire or manage mentors</li>
+            <li style="color:var(--muted);">Handle payments or billing</li>
+            <li style="color:var(--muted);">Build or maintain technology</li>
+            <li style="color:var(--muted);">Coordinate sessions or schedules</li>
+          </ul>
+        </div>
+        <div class="card gold-border">
+          <h4>💡 Optional: Require for Dev Teams</h4>
+          <p style="margin-top:8px;font-size:0.82rem;">Clubs that include Elevate as part of their development program see the highest enrollment — and the highest revenue. We start small (3–5 teams) and prove it before scaling.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 5: WIN-WIN ── -->
+  <div class="slide" id="slide-4">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">04 — Mutual Value</div>
+    <div class="label">Why This Works for Both Sides</div>
+    <div class="h2">A Genuine<br>Win-Win Partnership.</div>
+    <div class="win-win">
+      <div class="win-col gold-border">
+        <h4>🏟️ Your Club Wins</h4>
+        <ul class="check-list gold-checks">
+          <li>Passive monthly revenue — no effort required</li>
+          <li>Premium development resource for your players</li>
+          <li>Better-prepared athletes = stronger club reputation</li>
+          <li>More players getting recruited = proof your club delivers</li>
+          <li>Families see added value in your membership</li>
+          <li>Zero financial risk or upfront cost</li>
+        </ul>
+      </div>
+      <div class="win-divider">⚡</div>
+      <div class="win-col green-border">
+        <h4>⚽ Your Players Win</h4>
+        <ul class="check-list">
+          <li>Direct access to D1 &amp; pro-level mentors</li>
+          <li>Personalized recruiting roadmap</li>
+          <li>Accountability and development all month long</li>
+          <li>Strength, nutrition, and film support</li>
+          <li>Real mentorship at an accessible price</li>
+          <li>A competitive edge over players without it</li>
+        </ul>
+      </div>
+    </div>
+    <div class="quote-block" style="margin-top:28px;">
+      <p>"We handle everything — the mentors, the sessions, the billing, the results. You simply endorse a service your players will thank you for, and earn revenue while they improve."</p>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 6: HOW IT WORKS FOR THE CLUB ── -->
+  <div class="slide" id="slide-5">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">05 — How It Works</div>
+    <div class="label">Partnership Process</div>
+    <div class="h2">Up and Running<br>in Days, Not Months.</div>
+    <div class="four-col" style="margin-top:36px;">
+      <div class="card gold-border">
+        <div class="card-icon">🤝</div>
+        <h4>1. Partnership Signed</h4>
+        <p>We formalize a simple revenue-share agreement. No exclusivity required. No financial commitment from your club. Zero risk.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📣</div>
+        <h4>2. Club Introduces Elevate</h4>
+        <p>You introduce Elevate to your players and families via email, social media, or team meetings. We provide all marketing materials.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚽</div>
+        <h4>3. Players Enroll</h4>
+        <p>Families sign up directly at $45/month. Players are matched to mentors and onboarded immediately. Your club is credited for every enrollment.</p>
+      </div>
+      <div class="card green-border">
+        <div class="card-icon">💰</div>
+        <h4>4. Club Gets Paid</h4>
+        <p>25% of all revenue from your players is paid to your club monthly. Transparent reporting. Consistent income. No chasing payments.</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:24px;flex-wrap:wrap;">
+      <div class="card" style="flex:1;min-width:200px;padding:20px 24px;">
+        <p style="font-size:0.85rem;color:var(--text);">📋 <strong style="color:#fff;">We provide:</strong> All onboarding materials, landing pages, email templates, and player-facing content. Your club doesn't need to create anything.</p>
+      </div>
+      <div class="card" style="flex:1;min-width:200px;padding:20px 24px;">
+        <p style="font-size:0.85rem;color:var(--text);">📊 <strong style="color:#fff;">You receive:</strong> Monthly reports showing enrolled players, revenue generated, and your club's earnings — clear and simple.</p>
+      </div>
+      <div class="card gold-border" style="flex:1;min-width:200px;padding:20px 24px;">
+        <p style="font-size:0.85rem;color:var(--text);">🚀 <strong style="color:#fff;">Optional:</strong> We can present directly to your teams and parents to drive higher enrollment — on your schedule, at your facility.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 7: OUR MENTORS ── -->
+  <div class="slide" id="slide-6">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">06 — The Product</div>
+    <div class="label">What Your Players Get</div>
+    <div class="h2">Mentors Who've<br>Played at the Top.</div>
+    <div class="two-col" style="margin-top:32px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card green-border">
+          <div class="card-icon">🏆</div>
+          <h4>D1 &amp; Professional Mentors</h4>
+          <p>Every mentor has played at the D1 NCAA or professional level. Players aren't learning from observers — they're learning from athletes who've been exactly where they want to go.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🎯</div>
+          <h4>Personalized to Each Player</h4>
+          <p>Every athlete gets their own mentor, their own player profile, and their own development plan. No generic programs. No cookie-cutter advice.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📱</div>
+          <h4>Always Accessible</h4>
+          <p>Text your mentor any time. 36-hour response guarantee. Players stay accountable and supported all month — not just during the monthly call.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <h4 style="margin-bottom:16px;font-size:0.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Full Service Breakdown</h4>
+          <table class="data-table">
+            <thead><tr><th>Service</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Monthly 30-min 1-on-1 mentor call</td><td class="green">Included</td></tr>
+              <tr><td>Unlimited text access (36hr guarantee)</td><td class="green">Included</td></tr>
+              <tr><td>College recruiting guidance</td><td class="green">Included</td></tr>
+              <tr><td>Strength &amp; nutrition programming</td><td class="green">Included</td></tr>
+              <tr><td>Player profile &amp; progress tracking</td><td class="green">Included</td></tr>
+              <tr><td>Monthly parent updates</td><td class="green">Included</td></tr>
+              <tr><td>Film analysis</td><td style="color:var(--gold);font-weight:600;">Add-On</td></tr>
+              <tr><td>Academic support (Top-10 institution)</td><td style="color:var(--gold);font-weight:600;">Add-On</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card gold-border" style="text-align:center;padding:24px;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--gold);line-height:1;">$45</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;">Per player / per month</div>
+          <div style="font-size:0.78rem;color:var(--text);margin-top:12px;">No contracts. Cancel anytime. Families love the price.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 8: ALIGNMENT WITH COACHING STAFF ── -->
+  <div class="slide" id="slide-7">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">07 — Coach Alignment</div>
+    <div class="two-col" style="align-items:start;">
+      <div>
+        <div class="label">Working With Your Coaches</div>
+        <div class="h2">We Work Alongside<br>Your Staff — Not<br>Around Them.</div>
+        <p class="subtitle" style="margin-top:12px;margin-bottom:28px;">Elevate is designed to complement your coaching staff, not compete with them. We're not on the field — we're in the player's corner off it. And when clubs want us to, we align directly with what the coaching staff is building.</p>
+        <ul class="check-list">
+          <li>Mentors can be briefed on team goals and individual player needs</li>
+          <li>Player development plans can reflect in-season priorities set by your coaches</li>
+          <li>We reinforce — not replace — your coaching philosophy</li>
+          <li>Coaches can flag areas they want mentors to emphasize</li>
+          <li>Parents receive updates that are aligned with the club's messaging</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card green-border">
+          <div class="card-icon">🗓️</div>
+          <h4>In-Season &amp; Off-Season</h4>
+          <p>During the season, we focus on mindset, film, and in-game development. Off-season is when strength, nutrition, and recruiting strategy take center stage. We adapt to where your players are.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <h4>Transparent Player Progress</h4>
+          <p>Clubs who want visibility into player development can receive aggregate reports. We keep your coaches informed without creating extra work for anyone.</p>
+        </div>
+        <div class="card gold-border">
+          <div class="card-icon">🎓</div>
+          <h4>Recruiting = Club Reputation</h4>
+          <p>Every player we help get recruited builds your club's pipeline reputation. College coaches notice when a club consistently produces college-ready athletes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 9: REVENUE PROJECTIONS ── -->
+  <div class="slide" id="slide-8">
+    <div class="bg-grid"></div>
+    <div class="bg-glow gold"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">08 — Your Revenue</div>
+    <div class="label">Your Club's Earning Potential</div>
+    <div class="h2">Real Money.<br>Zero Work.</div>
+    <div class="two-col" style="margin-top:32px;align-items:start;gap:32px;">
+      <div>
+        <div style="margin-bottom:24px;">
+          <div class="progress-wrap">
+            <div class="progress-label"><span>25 players enrolled</span><span>$3,375 / year</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:5%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>50 players enrolled</span><span>$6,750 / year</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:10%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>100 players enrolled</span><span>$13,500 / year</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>200 players enrolled</span><span>$27,000 / year</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>500 players enrolled</span><span>$67,500 / year</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="card" style="padding:20px 24px;">
+          <p style="font-size:0.82rem;color:var(--muted);line-height:1.7;">The more teams you bring on, the more your club earns — automatically. A single large club with 3–5 teams enrolled could generate <strong style="color:var(--gold);">$10,000–$30,000+ per year</strong> in passive revenue with no additional staff or resources.</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card gold-border">
+          <h4 style="margin-bottom:18px;">Revenue Scenario: Mid-Size Club</h4>
+          <table class="data-table">
+            <thead><tr><th>Teams</th><th>Players</th><th>Annual Club Revenue</th></tr></thead>
+            <tbody>
+              <tr><td>1 team pilot</td><td>~20</td><td class="gold">$2,700</td></tr>
+              <tr><td>3 teams</td><td>~60</td><td class="gold">$8,100</td></tr>
+              <tr><td>5 teams</td><td>~100</td><td class="gold">$13,500</td></tr>
+              <tr class="gold-row"><td><strong>Full club</strong></td><td><strong>~200+</strong></td><td class="gold"><strong>$27,000+</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card green-border">
+          <h4>We Start Small on Purpose</h4>
+          <p style="margin-top:8px;font-size:0.82rem;">We propose starting with 3–5 teams to prove the service before scaling across your full club roster. This protects your players, your reputation, and ours.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 10: ROLLOUT PLAN ── -->
+  <div class="slide" id="slide-9">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div class="slide-tag">09 — Rollout</div>
+    <div class="two-col" style="align-items:start;">
+      <div>
+        <div class="label">Partnership Rollout Plan</div>
+        <div class="h2">Low Risk.<br>High Upside.<br>Proven First.</div>
+        <p class="subtitle" style="margin-top:14px;margin-bottom:28px;">We're not asking you to bet your club's reputation on day one. We start small, prove results, earn trust, then scale together.</p>
+        <div class="card gold-border">
+          <h4>Our Commitment to Your Club</h4>
+          <ul class="check-list" style="margin-top:12px;font-size:0.84rem;">
+            <li>Deliver exceptional service to every enrolled player</li>
+            <li>Never miss a scheduled call or go dark on a player</li>
+            <li>Keep all parent communications professional and aligned</li>
+            <li>Give you monthly transparent revenue reports</li>
+            <li>Take feedback seriously and improve continuously</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="tl-phase">Month 1</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <h5>Partnership Agreement &amp; Pilot Launch</h5>
+              <p>Sign agreement, select 1–3 pilot teams. We introduce ourselves to players and families. First enrollments begin.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-phase">Month 1–3</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <h5>Prove the Service</h5>
+              <p>We deliver exceptional mentorship. Players see real development. Families talk. Coaches give us feedback. You see your first revenue checks.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-phase">Month 3–6</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <h5>Expand Across Your Club</h5>
+              <p>With results proven, we roll out to additional teams. Word of mouth and club endorsement drive enrollment higher and club revenue grows.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="tl-phase">Month 6+</div>
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <h5>Full Integration &amp; Long-Term Partnership</h5>
+              <p>Elevate becomes a core part of your club's development offering. Players get results. Your club earns consistent passive revenue month after month.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SLIDE 11: CLOSING ── -->
+  <div class="slide" id="slide-10">
+    <div class="bg-grid"></div>
+    <div class="bg-glow tr"></div>
+    <div class="bg-glow bl"></div>
+    <div class="slide-logo">ELEVATE<span>⚽</span></div>
+    <div style="text-align:center;max-width:740px;margin:0 auto;">
+      <div class="badge gold-badge">🤝 Let's Build This Together</div>
+      <div class="h1" style="margin-bottom:24px;">Your Club.<br>Your Players.<br><span class="accent">Your Revenue.</span></div>
+      <p class="subtitle" style="text-align:center;margin:0 auto 40px;">We're looking for a small number of forward-thinking club partners to grow with us. If you believe in elite development for your players and see the value in a zero-risk revenue partnership — let's talk.</p>
+      <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:44px;">
+        <div class="card" style="min-width:150px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--gold);line-height:1;">25%</div>
+          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Revenue share</div>
+        </div>
+        <div class="card" style="min-width:150px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--green);line-height:1;">$0</div>
+          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Cost to your club</div>
+        </div>
+        <div class="card" style="min-width:150px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--green);line-height:1;">D1+Pro</div>
+          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Mentor level</div>
+        </div>
+        <div class="card gold-border" style="min-width:150px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:2.4rem;color:var(--gold);line-height:1;">$45</div>
+          <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Per player / month</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:32px;">
+        <p style="font-size:0.85rem;color:var(--muted);">Ready to explore a partnership?</p>
+        <p style="font-size:1.15rem;font-weight:700;color:#fff;margin-top:6px;">hello@elevatesoccer.com</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- NAV BAR -->
+<div class="nav-bar">
+  <button class="nav-btn" onclick="prevSlide()">←</button>
+  <div class="nav-dots" id="dots"></div>
+  <div class="slide-counter"><span id="currentNum">1</span> / <span id="totalNum">11</span></div>
+  <button class="nav-btn" onclick="nextSlide()">→</button>
+</div>
+
+<!-- KEYBOARD HINT -->
+<div class="key-hint">
+  <span class="key">←</span><span class="key">→</span>
+  <span style="color:var(--muted);font-size:0.7rem;">navigate</span>
+</div>
+
+<script>
+  const totalSlides = 11;
+  let current = 0;
+
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < totalSlides; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+  document.getElementById('totalNum').textContent = totalSlides;
+
+  function goTo(n) {
+    const slides = document.querySelectorAll('.slide');
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current].classList.remove('exit'), 460);
+    current = (n + totalSlides) % totalSlides;
+    slides[current].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+    document.getElementById('currentNum').textContent = current + 1;
+
+    if (current === 8) {
+      document.querySelectorAll('.progress-fill').forEach(el => {
+        const w = el.style.width;
+        el.style.width = '0%';
+        setTimeout(() => el.style.width = w, 100);
+      });
+    }
+  }
+
+  function nextSlide() { goTo(current + 1); }
+  function prevSlide() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+  });
+
+  let touchX = 0;
+  document.addEventListener('touchstart', e => touchX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) dx < 0 ? nextSlide() : prevSlide();
+  });
+</script>
+</body>
+</html>

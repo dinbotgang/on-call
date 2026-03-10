@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@polymarket/clob-client": "^5.2.4",
+    "ethers": "^5.8.0",
+    "pdf-lib": "^1.17.1",
+    "puppeteer": "^24.37.5"
+  }
+}

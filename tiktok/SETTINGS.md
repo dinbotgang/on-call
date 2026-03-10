@@ -41,6 +41,15 @@
   Style: Default,Arial,26,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,1,0,1,3,2,5,30,30,0,1
   ```
 
+## Minecraft Background — Reuse Policy
+- **ALWAYS reuse the same downloaded video** — do NOT re-download each time
+- Track position in `tiktok/minecraft_progress.json`
+- Before every new video: read `next_start` from that file, use it as the `-ss` timestamp
+- After rendering: update `used_segments` and advance `next_start` by the video duration + 5s buffer
+- When `next_start` > `total_duration_seconds - 60`: download a new Minecraft video and reset
+- Current file: `/tmp/tiktok-video/minecraft_real.mp4` (702s total, ~14 videos remaining)
+- ⚠️ File lives in `/tmp` — lost on VPS reboot. Check it exists before each render, re-download if missing.
+
 ## Output
 - **Resolution:** 1080x1920 (9:16 vertical)
 - **FPS:** 60

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Agents for Austin Small Business</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0a0a0a;
+    color: #f0f0f0;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 60px 80px;
+    flex-direction: column;
+    justify-content: center;
+    position: absolute;
+    top: 0; left: 0;
+    animation: fadeIn 0.4s ease;
+  }
+  .slide.active { display: flex; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Slide themes */
+  .slide-1  { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
+  .slide-2  { background: linear-gradient(135deg, #1a1a2e, #16213e); }
+  .slide-3  { background: linear-gradient(135deg, #0d0d0d, #1a1a1a); }
+  .slide-4  { background: linear-gradient(135deg, #0f2027, #1a1a2e); }
+  .slide-5  { background: linear-gradient(135deg, #0d1117, #161b22); }
+  .slide-6  { background: linear-gradient(135deg, #1a0a2e, #2d1b4e); }
+  .slide-7  { background: linear-gradient(135deg, #0a1628, #0f2540); }
+  .slide-8  { background: linear-gradient(135deg, #0d0d0d, #1a1a1a); }
+  .slide-9  { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
+
+  .tag {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #4fc3f7;
+    margin-bottom: 20px;
+  }
+
+  h1 { font-size: 58px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+  h2 { font-size: 42px; font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+  h3 { font-size: 22px; font-weight: 600; margin-bottom: 10px; }
+
+  .accent { color: #4fc3f7; }
+  .accent-green { color: #66bb6a; }
+  .accent-orange { color: #ffa726; }
+
+  .subtitle {
+    font-size: 20px;
+    color: #9e9e9e;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .logo-mark {
+    font-size: 72px;
+    margin-bottom: 24px;
+  }
+
+  /* Cards grid */
+  .cards {
+    display: grid;
+    gap: 20px;
+    margin-top: 10px;
+  }
+  .cards-3 { grid-template-columns: repeat(3, 1fr); }
+  .cards-2 { grid-template-columns: repeat(2, 1fr); }
+
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 28px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #4fc3f7; }
+
+  .card-icon { font-size: 36px; margin-bottom: 12px; }
+  .card p { font-size: 15px; color: #bdbdbd; line-height: 1.6; margin-top: 6px; }
+
+  /* Stats row */
+  .stats {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+  }
+  .stat-num {
+    font-size: 52px;
+    font-weight: 800;
+    color: #4fc3f7;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 14px;
+    color: #9e9e9e;
+    margin-top: 4px;
+  }
+
+  /* Pricing table */
+  .pricing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 10px;
+  }
+  .plan {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+  }
+  .plan.featured {
+    border-color: #4fc3f7;
+    background: rgba(79,195,247,0.08);
+  }
+  .plan-name { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: #9e9e9e; margin-bottom: 12px; }
+  .plan-price { font-size: 40px; font-weight: 800; color: #f0f0f0; }
+  .plan-price span { font-size: 16px; color: #9e9e9e; }
+  .plan-setup { font-size: 13px; color: #66bb6a; margin: 6px 0 16px; }
+  .plan-features { list-style: none; text-align: left; }
+  .plan-features li { font-size: 14px; color: #bdbdbd; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .plan-features li::before { content: "✓  "; color: #4fc3f7; }
+
+  /* Timeline */
+  .timeline { margin-top: 10px; }
+  .tl-item {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+    align-items: flex-start;
+  }
+  .tl-num {
+    background: #4fc3f7;
+    color: #000;
+    font-weight: 800;
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .tl-content h3 { margin-bottom: 4px; font-size: 18px; }
+  .tl-content p { font-size: 14px; color: #9e9e9e; line-height: 1.5; }
+
+  /* Pain points */
+  .pain-list { list-style: none; margin-top: 16px; }
+  .pain-list li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .pain-list li .emoji { font-size: 24px; flex-shrink: 0; }
+  .pain-list li .text { color: #e0e0e0; }
+  .pain-list li .subtext { font-size: 14px; color: #757575; display: block; }
+
+  /* Revenue projection */
+  .rev-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+  .rev-table th { text-align: left; padding: 10px 16px; color: #9e9e9e; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .rev-table td { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .rev-table tr:last-child td { color: #66bb6a; font-weight: 700; font-size: 17px; }
+
+  /* Nav */
+  .nav {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 50px;
+    padding: 10px 20px;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+  }
+  .nav button {
+    background: none;
+    border: none;
+    color: #f0f0f0;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  .nav button:hover { background: rgba(255,255,255,0.1); }
+  .nav .counter { font-size: 13px; color: #9e9e9e; min-width: 50px; text-align: center; }
+
+  .dots {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .dot.active { background: #4fc3f7; transform: scale(1.4); }
+
+  /* CTA slide */
+  .cta-box {
+    background: rgba(79,195,247,0.1);
+    border: 1px solid rgba(79,195,247,0.3);
+    border-radius: 20px;
+    padding: 36px 40px;
+    margin-top: 24px;
+    max-width: 560px;
+  }
+  .cta-box p { font-size: 16px; color: #bdbdbd; line-height: 1.7; }
+
+  .divider {
+    width: 60px;
+    height: 4px;
+    background: #4fc3f7;
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide slide-1 active">
+    <div class="logo-mark">🤖</div>
+    <div class="tag">Austin AI Solutions</div>
+    <h1>Your Business.<br/><span class="accent">Always On.</span></h1>
+    <p class="subtitle">AI agents that handle the repetitive work — so Austin's small businesses can focus on what they do best.</p>
+  </div>
+
+  <!-- SLIDE 2: The Problem -->
+  <div class="slide slide-2">
+    <div class="tag">The Problem</div>
+    <h2>Small businesses are <span class="accent">stretched thin.</span></h2>
+    <ul class="pain-list">
+      <li>
+        <span class="emoji">📞</span>
+        <div class="text">Missed calls & messages = lost revenue
+          <span class="subtext">62% of customers won't call back if they don't get an answer</span>
+        </div>
+      </li>
+      <li>
+        <span class="emoji">⏰</span>
+        <div class="text">Hours wasted on repetitive tasks
+          <span class="subtext">Scheduling, FAQs, follow-ups — the same 10 questions every day</span>
+        </div>
+      </li>
+      <li>
+        <span class="emoji">💸</span>
+        <div class="text">Can't afford a full-time staff member for it
+          <span class="subtext">A receptionist costs $35k+/yr. There's a better way.</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- SLIDE 3: The Solution -->
+  <div class="slide slide-3">
+    <div class="tag">The Solution</div>
+    <h2>An AI agent that works <span class="accent">24/7</span> for a fraction of the cost.</h2>
+    <div class="cards cards-3" style="margin-top:28px">
+      <div class="card">
+        <div class="card-icon">💬</div>
+        <h3>Instant Responses</h3>
+        <p>Answers customer questions on WhatsApp, Instagram DMs, and your website — any time of day.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📅</div>
+        <h3>Booking & Scheduling</h3>
+        <p>Takes appointments, sends reminders, handles rescheduling — without you lifting a finger.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔁</div>
+        <h3>Follow-ups & Leads</h3>
+        <p>Qualifies inbound leads, follows up automatically, and only escalates when it matters.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Who It's For -->
+  <div class="slide slide-4">
+    <div class="tag">Target Market</div>
+    <h2>Built for <span class="accent">Austin's</span> small business community.</h2>
+    <div class="cards cards-2" style="margin-top:28px">
+      <div class="card">
+        <div class="card-icon">🍽️</div>
+        <h3>Restaurants & Food Trucks</h3>
+        <p>Hours, reservations, specials, catering inquiries. Let the agent handle it while you run the kitchen.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💪</div>
+        <h3>Fitness Studios & Salons</h3>
+        <p>Class bookings, appointment reminders, rebooking no-shows — all automated.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔨</div>
+        <h3>Contractors & Home Services</h3>
+        <p>Qualify leads, collect job details, schedule estimates — before you even pick up the phone.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛍️</div>
+        <h3>Boutiques & Local Retail</h3>
+        <p>Product questions, hours, custom orders, events — handled instantly, consistently.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: How It Works -->
+  <div class="slide slide-5">
+    <div class="tag">How It Works</div>
+    <h2>Simple setup. <span class="accent">Zero headaches.</span></h2>
+    <div class="timeline" style="margin-top:28px">
+      <div class="tl-item">
+        <div class="tl-num">1</div>
+        <div class="tl-content">
+          <h3>Discovery Call (30 min)</h3>
+          <p>We learn your business — your FAQs, your tone, your workflow, your channels.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">2</div>
+        <div class="tl-content">
+          <h3>We Build & Configure Your Agent</h3>
+          <p>Custom-trained on your business. Connected to WhatsApp, Instagram, or your website. Takes 3–5 days.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-num">3</div>
+        <div class="tl-content">
+          <h3>Go Live — We Handle the Rest</h3>
+          <p>Your agent goes live. We monitor it, tune it, and keep it running. You just do your thing.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Pricing -->
+  <div class="slide slide-6">
+    <div class="tag">Pricing</div>
+    <h2>Straightforward. <span class="accent">No surprises.</span></h2>
+    <div class="pricing">
+      <div class="plan">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">$149<span>/mo</span></div>
+        <div class="plan-setup">+ $299 setup</div>
+        <ul class="plan-features">
+          <li>1 channel (WhatsApp or web)</li>
+          <li>FAQ & hours responses</li>
+          <li>Basic lead capture</li>
+          <li>Monthly check-in</li>
+        </ul>
+      </div>
+      <div class="plan featured">
+        <div class="plan-name">⭐ Growth</div>
+        <div class="plan-price">$249<span>/mo</span></div>
+        <div class="plan-setup">+ $499 setup</div>
+        <ul class="plan-features">
+          <li>2 channels (WhatsApp + Instagram)</li>
+          <li>Booking & scheduling</li>
+          <li>Lead qualification</li>
+          <li>Monthly tuning & tweaks</li>
+        </ul>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$399<span>/mo</span></div>
+        <div class="plan-setup">+ $799 setup</div>
+        <ul class="plan-features">
+          <li>All channels</li>
+          <li>Full workflow automation</li>
+          <li>Priority support</li>
+          <li>Weekly reviews</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Revenue Potential -->
+  <div class="slide slide-7">
+    <div class="tag">The Opportunity</div>
+    <h2>10 clients = <span class="accent-green">real money.</span></h2>
+    <table class="rev-table">
+      <thead>
+        <tr>
+          <th>Clients</th>
+          <th>Avg Monthly Retainer</th>
+          <th>Monthly Revenue</th>
+          <th>Annual Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>5 clients</td>
+          <td>$200/mo</td>
+          <td>$1,000</td>
+          <td>$12,000</td>
+        </tr>
+        <tr>
+          <td>10 clients</td>
+          <td>$200/mo</td>
+          <td>$2,000</td>
+          <td>$24,000</td>
+        </tr>
+        <tr>
+          <td>20 clients</td>
+          <td>$220/mo</td>
+          <td>$4,400</td>
+          <td>$52,800</td>
+        </tr>
+        <tr>
+          <td>50 clients</td>
+          <td>$230/mo</td>
+          <td>$11,500</td>
+          <td>$138,000 🎯</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size:13px; color:#616161; margin-top:16px;">* Setup fees are additive — 10 new clients/mo at $400 avg setup = +$4k/mo additional</p>
+  </div>
+
+  <!-- SLIDE 8: Why Us -->
+  <div class="slide slide-8">
+    <div class="tag">Why Choose Us</div>
+    <h2>We're <span class="accent">local.</span> We get Austin.</h2>
+    <div class="cards cards-3" style="margin-top:28px">
+      <div class="card">
+        <div class="card-icon">📍</div>
+        <h3>Local & In-Person</h3>
+        <p>We're Austin-based. We'll sit down with you, walk you through it, and be here when you need us.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛠️</div>
+        <h3>Done-For-You</h3>
+        <p>You don't touch any tech. We handle the setup, training, and ongoing management.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤝</div>
+        <h3>No Lock-In</h3>
+        <p>Cancel anytime. No long-term contracts. We earn your business every month.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: CTA -->
+  <div class="slide slide-9">
+    <div class="tag">Let's Get Started</div>
+    <h2>Ready to put your business<br/><span class="accent">on autopilot?</span></h2>
+    <div class="cta-box">
+      <p>We're offering a <strong style="color:#f0f0f0;">free 30-minute consultation</strong> to Austin small businesses — no pitch, no pressure. Just an honest look at whether an AI agent makes sense for you.</p>
+      <p style="margin-top:16px;">📧 <strong style="color:#4fc3f7;">[your email]</strong></p>
+      <p style="margin-top:6px;">📱 <strong style="color:#4fc3f7;">[your phone]</strong></p>
+      <p style="margin-top:6px;">🌐 <strong style="color:#4fc3f7;">[your website]</strong></p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="prev()">←</button>
+  <span class="counter" id="counter">1 / 9</span>
+  <button onclick="next()">→</button>
+</div>
+
+<!-- Dots -->
+<div class="dots" id="dots"></div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const dotsEl = document.getElementById('dots');
+
+  // Build dots
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+    document.getElementById('counter').textContent = `${current + 1} / ${total}`;
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+  });
+</script>
+</body>
+</html>
