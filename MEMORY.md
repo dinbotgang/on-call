@@ -94,6 +94,7 @@ DO NOT use NordVPN system-wide on the VPS — it reroutes all traffic including 
 - **YouTube download:** `yt-dlp --cookies /root/yt_cookies.txt --no-js-runtimes --js-runtimes node --extractor-args "youtube:player_client=mediaconnect" -f "299+140"`
 - **Minecraft audio:** Keep at ~15% volume under voice for ambiance
 - **Story style:** Short creepy horror, punchy sentences, twist ending, ~10 sentences
+- **Video length: 25–35 seconds STRICT** — check after voice gen, adjust speed or add/remove sentences if outside range
 - **Kokoro models in /tmp** — need re-download after VPS reboot
 - **Minecraft footage:** REUSE `/tmp/tiktok-video/minecraft_real.mp4` (702s, `7yl7Wc1dtWc`) — track position in `tiktok/minecraft_progress.json`, read `next_start` before every render, update after. Re-download when running low or file missing from /tmp.
 - **Serve for download:** Python HTTP on port 7654, PowerShell `Invoke-WebRequest` to `C:\Users\georg\Downloads\`

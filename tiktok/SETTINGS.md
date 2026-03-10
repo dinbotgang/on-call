@@ -63,7 +63,10 @@
 - PowerShell: `Invoke-WebRequest -Uri "http://178.156.248.17:7654/FILENAME" -OutFile "C:\Users\georg\Downloads\FILENAME"`
 
 ## Story Style
-- Creepy/horror short stories (30–60 seconds)
+- Creepy/horror short stories
+- **Length: 25–35 seconds STRICTLY enforced** — generate voice, check duration, rewrite/adjust speed if out of range
 - Short punchy sentences with dramatic pauses
 - Twist ending
-- ~10 sentences max
+- ~9-11 sentences
+- If voice renders < 25s: slow speed down (try 0.80) or add sentences
+- If voice renders > 35s: speed up (try 0.90) or trim sentences
