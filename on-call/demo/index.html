@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>On Call — App Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #FF5C00;
+      --accent-hire: #3B82F6;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --bg: #f0f0f0;
+      --phone-bg: #0a0a0a;
+      --surface: #111;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #fff;
+      --text2: #aaa;
+      --text3: #555;
+      --card: #161616;
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    /* ── Demo header ── */
+    .demo-header {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+    .demo-header h1 { font-size: 28px; font-weight: 900; letter-spacing: -1px; }
+    .demo-header h1 span { color: var(--accent); }
+    .demo-header p { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    /* ── Mode switcher ── */
+    .mode-switcher {
+      display: flex;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      gap: 4px;
+    }
+    .mode-btn {
+      padding: 10px 24px;
+      border-radius: 9px;
+      font-size: 14px; font-weight: 700;
+      border: none; cursor: pointer;
+      transition: all 0.2s;
+      color: rgba(255,255,255,0.5);
+      background: transparent;
+    }
+    .mode-btn.active-hire {
+      background: var(--accent-hire);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+    }
+    .mode-btn.active-work {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(255,92,0,0.4);
+    }
+
+    /* ── Phone frame ── */
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: var(--phone-bg);
+      border-radius: 48px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 2px #333,
+        0 0 0 4px #111,
+        0 40px 80px rgba(0,0,0,0.7),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    /* Notch */
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 28px;
+      background: #000;
+      border-radius: 0 0 20px 20px;
+      z-index: 50;
+    }
+
+    /* Status bar */
+    .status-bar {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px 0;
+      z-index: 40;
+      color: #fff; font-size: 13px; font-weight: 600;
+    }
+    .status-bar .time { font-weight: 700; }
+    .status-icons { display: flex; gap: 5px; align-items: center; font-size: 11px; }
+
+    /* Home indicator */
+    .phone::after {
+      content: '';
+      position: absolute;
+      bottom: 8px; left: 50%; transform: translateX(-50%);
+      width: 120px; height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      z-index: 50;
+    }
+
+    /* ── Screen system ── */
+    .screen-container {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transform: translateX(100%);
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+    .screen.active { transform: translateX(0); }
+    .screen.exit { transform: translateX(-30%); }
+
+    /* ── Shared screen components ── */
+    .screen-content {
+      padding-top: 44px;
+      min-height: 100%;
+      background: var(--phone-bg);
+      padding-bottom: 90px;
+    }
+
+    .app-header {
+      padding: 16px 20px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .app-header h2 { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
+    .app-header .back-btn {
+      width: 34px; height: 34px;
+      background: var(--surface2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; border: none; color: var(--text);
+      transition: background 0.15s;
+    }
+    .app-header .back-btn:hover { background: var(--border); }
+
+    /* Bottom nav */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 80px;
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 10px 16px;
+      z-index: 30;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; color: var(--text3);
+      cursor: pointer; padding: 6px 12px; border-radius: 10px;
+      transition: all 0.15s; border: none; background: transparent;
+    }
+    .nav-item.active { color: var(--accent); }
+    .nav-item .nav-icon { font-size: 22px; }
+
+    /* ── HIRE SCREENS ── */
+
+    /* H1: Home - Category select */
+    .hire-home { background: var(--phone-bg); }
+    .hire-greeting { padding: 20px 20px 8px; }
+    .hire-greeting .hey { font-size: 14px; color: var(--text2); }
+    .hire-greeting h2 { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-top: 2px; }
+
+    .search-bar {
+      margin: 12px 20px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+      color: var(--text3); font-size: 15px;
+    }
+
+    .section-label-sm {
+      padding: 16px 20px 10px;
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text3);
+    }
+
+    .cat-row {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 10px; padding: 0 20px;
+    }
+    .cat-tile {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      text-align: left;
+    }
+    .cat-tile:hover, .cat-tile:active { transform: scale(0.97); }
+    .cat-tile .emoji { font-size: 28px; margin-bottom: 8px; display: block; }
+    .cat-tile .name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .cat-tile .count { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .cat-tile.hot { border: 1px solid rgba(255,92,0,0.3); background: linear-gradient(135deg, #1a0f08, #111); }
+
+    .near-you {
+      padding: 0 20px;
+      margin-top: 8px;
+    }
+    .near-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .near-card:hover { border-color: var(--accent); }
+    .worker-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .near-info { flex: 1; }
+    .near-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .near-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .near-avail { font-size: 11px; font-weight: 700; color: var(--green); }
+
+    /* H2: Worker list */
+    .worker-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin: 0 20px 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .worker-card:hover { border-color: var(--accent-hire); transform: translateY(-1px); }
+    .worker-card-top {
+      padding: 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .wc-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; flex-shrink: 0;
+    }
+    .wc-info { flex: 1; }
+    .wc-name { font-size: 17px; font-weight: 800; color: var(--text); }
+    .wc-skill { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .wc-rating {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 13px; font-weight: 700; color: var(--yellow);
+      margin-top: 6px;
+    }
+    .wc-rating span { color: var(--text2); font-weight: 400; font-size: 12px; }
+    .wc-right { text-align: right; }
+    .wc-rate { font-size: 17px; font-weight: 800; color: var(--text); }
+    .wc-rate-label { font-size: 11px; color: var(--text3); }
+    .wc-dist { font-size: 12px; color: var(--text2); margin-top: 6px; }
+    .worker-card-bottom {
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .avail-badge {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 700; color: var(--green);
+    }
+    .avail-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .jobs-done { font-size: 12px; color: var(--text3); }
+
+    /* H3: Worker profile */
+    .profile-hero {
+      height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px;
+      background: linear-gradient(180deg, #1a1a2e 0%, var(--phone-bg) 100%);
+      position: relative;
+    }
+    .profile-badges {
+      position: absolute; bottom: 12px; right: 16px;
+      display: flex; gap: 6px;
+    }
+    .badge-pill {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; color: #fff;
+    }
+    .badge-pill.verified { color: var(--green); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.1); }
+
+    .profile-main { padding: 0 20px; }
+    .profile-name { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+    .profile-title { font-size: 15px; color: var(--text2); margin-top: 2px; }
+    .profile-stats {
+      display: flex; gap: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin: 16px 0;
+      overflow: hidden;
+    }
+    .stat { flex: 1; padding: 14px 0; text-align: center; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-val { font-size: 20px; font-weight: 800; color: var(--text); }
+    .stat-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .stat-val.gold { color: var(--yellow); }
+    .stat-val.green { color: var(--green); }
+
+    .profile-section { margin-bottom: 20px; }
+    .profile-section h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 10px; }
+    .profile-bio { font-size: 15px; color: var(--text2); line-height: 1.6; }
+    .skill-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 6px 12px; border-radius: 20px;
+      font-size: 13px; font-weight: 600; color: var(--text2);
+    }
+    .review-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    }
+    .review-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .review-avatar { font-size: 20px; }
+    .review-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .review-date { font-size: 11px; color: var(--text3); margin-left: auto; }
+    .review-stars { color: var(--yellow); font-size: 12px; margin-bottom: 4px; }
+    .review-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+    .book-btn {
+      position: sticky; bottom: 90px; left: 20px; right: 20px;
+      margin: 0 20px 12px;
+      padding: 16px;
+      background: var(--accent-hire);
+      color: #fff; font-size: 16px; font-weight: 800;
+      border: none; border-radius: 14px; cursor: pointer;
+      width: calc(100% - 40px);
+      box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+      transition: all 0.15s;
+    }
+    .book-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(59,130,246,0.5); }
+
+    /* H4: Booking confirm */
+    .booking-worker {
+      margin: 16px 20px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .booking-worker .avatar { font-size: 40px; }
+    .booking-worker .info { flex: 1; }
+    .booking-worker .name { font-size: 18px; font-weight: 800; color: var(--text); }
+    .booking-worker .sub { font-size: 13px; color: var(--text2); }
+    .booking-worker .rate { font-size: 16px; font-weight: 700; color: var(--text); }
+
+    .booking-details { padding: 0 20px; }
+    .detail-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-size: 14px; color: var(--text2); }
+    .detail-val { font-size: 14px; font-weight: 700; color: var(--text); }
+    .detail-val.green { color: var(--green); }
+
+    .address-field {
+      margin: 16px 20px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .address-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
+    .address-field p { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 4px; }
+
+    .confirm-btn {
+      margin: 16px 20px;
+      padding: 16px;
+      background: var(--accent-hire);
+      color: #fff; font-size: 16px; font-weight: 800;
+      border: none; border-radius: 14px; cursor: pointer;
+      width: calc(100% - 40px);
+      box-shadow: 0 8px 24px rgba(59,130,246,0.4);
+      transition: all 0.15s;
+    }
+    .confirm-btn:hover { transform: translateY(-1px); }
+
+    /* H5: Active job */
+    .map-placeholder {
+      height: 220px;
+      background: linear-gradient(135deg, #1a2744 0%, #0f1929 100%);
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .map-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .map-roads {
+      position: absolute; inset: 0;
+    }
+    .map-pin { font-size: 40px; position: relative; z-index: 2; }
+    .map-worker-dot {
+      position: absolute; bottom: 50px; left: 80px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--accent-hire);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.3);
+      animation: pulse 2s infinite;
+      z-index: 2;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(59,130,246,0.3); }
+      50% { box-shadow: 0 0 0 10px rgba(59,130,246,0.1); }
+    }
+    .map-you-dot {
+      position: absolute; top: 60px; right: 70px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent-hire);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+      z-index: 2;
+    }
+    .eta-card {
+      margin: 16px 20px;
+      background: var(--accent-hire);
+      border-radius: 16px; padding: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .eta-left {}
+    .eta-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; }
+    .eta-time { font-size: 36px; font-weight: 900; color: #fff; letter-spacing: -1px; }
+    .eta-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+    .eta-worker { text-align: center; }
+    .eta-worker .av { font-size: 36px; }
+    .eta-worker .wname { font-size: 14px; font-weight: 700; color: #fff; }
+    .eta-worker .wrating { font-size: 12px; color: rgba(255,255,255,0.7); }
+
+    .active-actions { display: flex; gap: 10px; padding: 0 20px; margin-top: 4px; }
+    .action-btn {
+      flex: 1; padding: 14px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; transition: all 0.15s; font-family: inherit;
+    }
+    .action-btn:hover { border-color: var(--accent-hire); }
+    .action-btn .ab-icon { font-size: 22px; }
+    .action-btn .ab-label { font-size: 12px; font-weight: 600; color: var(--text2); }
+
+    /* ── WORK SCREENS ── */
+
+    /* W1: Work home */
+    .work-home-header {
+      padding: 20px 20px 8px;
+    }
+    .work-home-header .greeting { font-size: 14px; color: var(--text2); }
+    .work-home-header h2 { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; margin-top: 2px; }
+
+    .toggle-card {
+      margin: 16px 20px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 24px;
+      text-align: center;
+    }
+    .toggle-status { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .toggle-status.on { color: var(--green); }
+    .toggle-status.off { color: var(--text3); }
+    .big-toggle {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: none; cursor: pointer; font-size: 32px;
+      transition: all 0.2s; margin: 0 auto 14px; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .big-toggle.on { background: var(--green); box-shadow: 0 0 0 12px rgba(34,197,94,0.1), 0 8px 24px rgba(34,197,94,0.4); }
+    .big-toggle.off { background: var(--surface2); box-shadow: none; }
+    .toggle-desc { font-size: 14px; color: var(--text2); }
+
+    .earnings-card {
+      margin: 0 20px 16px;
+      background: linear-gradient(135deg, #1a3a1a, #111);
+      border: 1px solid rgba(34,197,94,0.2);
+      border-radius: 16px; padding: 20px;
+      display: flex; gap: 0;
+    }
+    .earn-stat { flex: 1; }
+    .earn-stat + .earn-stat { border-left: 1px solid rgba(34,197,94,0.15); padding-left: 20px; }
+    .earn-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(34,197,94,0.7); }
+    .earn-val { font-size: 26px; font-weight: 900; color: var(--green); margin-top: 2px; letter-spacing: -1px; }
+    .earn-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    .recent-jobs { padding: 0 20px; }
+    .rj-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 0; border-bottom: 1px solid var(--border);
+    }
+    .rj-icon { font-size: 24px; width: 40px; height: 40px; background: var(--surface2); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .rj-info { flex: 1; }
+    .rj-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .rj-date { font-size: 12px; color: var(--text3); margin-top: 1px; }
+    .rj-pay { font-size: 15px; font-weight: 800; color: var(--green); }
+
+    /* W2: Incoming job ping */
+    .ping-screen { background: var(--phone-bg); }
+    .ping-header { padding: 60px 20px 20px; text-align: center; }
+    .ping-header .ping-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--accent);
+      background: var(--accent-dim, rgba(255,92,0,0.1));
+      border: 1px solid rgba(255,92,0,0.2);
+      padding: 4px 12px; border-radius: 20px;
+      display: inline-block; margin-bottom: 16px;
+    }
+    .ping-header h2 { font-size: 28px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+    .ping-header p { font-size: 15px; color: var(--text2); margin-top: 4px; }
+
+    .countdown-ring {
+      width: 100px; height: 100px;
+      margin: 0 auto 20px;
+      position: relative;
+    }
+    .countdown-ring svg { transform: rotate(-90deg); }
+    .countdown-ring .num {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 900; color: var(--accent);
+    }
+
+    .ping-job-card {
+      margin: 0 20px 16px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .pjc-top {
+      padding: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .pjc-emoji { font-size: 36px; background: var(--surface2); border-radius: 10px; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
+    .pjc-info { flex: 1; }
+    .pjc-type { font-size: 18px; font-weight: 800; color: var(--text); }
+    .pjc-addr { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .pjc-pay { text-align: right; }
+    .pjc-amount { font-size: 22px; font-weight: 900; color: var(--green); }
+    .pjc-est { font-size: 11px; color: var(--text3); }
+    .pjc-row {
+      border-top: 1px solid var(--border);
+      display: flex;
+    }
+    .pjc-detail { flex: 1; padding: 12px 16px; border-right: 1px solid var(--border); }
+    .pjc-detail:last-child { border-right: none; }
+    .pjc-detail .dlabel { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
+    .pjc-detail .dval { font-size: 14px; font-weight: 700; color: var(--text); margin-top: 2px; }
+
+    .ping-actions { display: flex; gap: 12px; padding: 0 20px; }
+    .ping-decline {
+      flex: 1; padding: 16px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 14px; font-size: 16px; font-weight: 700; color: var(--text2);
+      cursor: pointer; transition: all 0.15s; font-family: inherit;
+    }
+    .ping-accept {
+      flex: 2; padding: 16px;
+      background: var(--green);
+      border: none; border-radius: 14px; font-size: 16px; font-weight: 800; color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(34,197,94,0.4);
+      transition: all 0.15s; font-family: inherit;
+    }
+    .ping-accept:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(34,197,94,0.5); }
+
+    /* W3: Job accepted / navigate */
+    .nav-map {
+      height: 240px;
+      background: linear-gradient(135deg, #1a2744, #0f1929);
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-route {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .nav-line {
+      position: absolute;
+      top: 50%; left: 20%; right: 20%;
+      height: 3px; background: var(--accent);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .nav-start { position: absolute; left: 20%; top: 50%; transform: translate(-50%, -50%); font-size: 20px; z-index: 2; }
+    .nav-end { position: absolute; right: 20%; top: 50%; transform: translate(50%, -50%); font-size: 20px; z-index: 2; }
+
+    .nav-details { padding: 16px 20px; }
+    .nav-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .nav-icon { font-size: 20px; width: 36px; height: 36px; background: var(--surface2); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .nav-text .nlabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
+    .nav-text .nval { font-size: 15px; font-weight: 700; color: var(--text); }
+
+    .client-card {
+      margin: 0 20px 16px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .client-card .cav { font-size: 32px; }
+    .client-card .cinfo { flex: 1; }
+    .client-card .cname { font-size: 16px; font-weight: 700; color: var(--text); }
+    .client-card .cjob { font-size: 13px; color: var(--text2); }
+    .client-card .chat-btn {
+      padding: 8px 16px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text2);
+      cursor: pointer; font-family: inherit;
+    }
+
+    .arrived-btn {
+      margin: 0 20px;
+      width: calc(100% - 40px); padding: 16px;
+      background: var(--accent); border: none; border-radius: 14px;
+      font-size: 16px; font-weight: 800; color: #fff; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(255,92,0,0.4);
+      font-family: inherit; transition: all 0.15s;
+    }
+    .arrived-btn:hover { transform: translateY(-1px); }
+
+    /* W4: Complete / payout */
+    .complete-screen { text-align: center; padding: 60px 20px 20px; }
+    .complete-screen .big-check { font-size: 72px; margin-bottom: 20px; }
+    .complete-screen h2 { font-size: 28px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+    .complete-screen p { font-size: 15px; color: var(--text2); margin-top: 6px; }
+    .payout-card {
+      margin: 24px 0;
+      background: linear-gradient(135deg, #1a3a1a, #0f1f0f);
+      border: 1px solid rgba(34,197,94,0.25);
+      border-radius: 20px; padding: 28px;
+    }
+    .payout-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(34,197,94,0.6); margin-bottom: 6px; }
+    .payout-amount { font-size: 52px; font-weight: 900; color: var(--green); letter-spacing: -2px; }
+    .payout-sub { font-size: 13px; color: rgba(34,197,94,0.5); margin-top: 4px; }
+    .payout-breakdown { margin-top: 16px; text-align: left; }
+    .pb-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-top: 1px solid rgba(34,197,94,0.1); }
+    .pb-row .pbl { color: rgba(255,255,255,0.4); }
+    .pb-row .pbv { color: var(--green); font-weight: 600; }
+
+    .done-btn {
+      width: 100%; padding: 16px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 14px; font-size: 16px; font-weight: 700; color: var(--text2);
+      cursor: pointer; font-family: inherit; transition: all 0.15s;
+    }
+
+    /* ── Animations ── */
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    @keyframes slideOutLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(-30%); }
+    }
+
+    /* ── Demo tip ── */
+    .demo-tip {
+      margin-top: 20px;
+      color: rgba(255,255,255,0.35);
+      font-size: 12px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="demo-header">
+  <h1>ON<span>CALL</span> — App Demo</h1>
+  <p>Interactive prototype · Austin, TX beta</p>
+</div>
+
+<div class="mode-switcher">
+  <button class="mode-btn active-hire" id="hire-tab" onclick="setMode('hire')">🔵 I Need Help</button>
+  <button class="mode-btn" id="work-tab" onclick="setMode('work')">🟢 I Want Work</button>
+</div>
+
+<div class="phone">
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="time" id="clock">9:41</span>
+    <div class="status-icons">
+      <span>●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </div>
+  </div>
+
+  <div class="screen-container" id="screen-container">
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- HIRE SCREENS -->
+    <!-- ═══════════════════════════════════ -->
+
+    <!-- H1: Hire Home -->
+    <div class="screen active" id="h1">
+      <div class="screen-content">
+        <div class="hire-greeting">
+          <div class="hey">Good morning 👋</div>
+          <h2>What do you need<br />done today?</h2>
+        </div>
+        <div class="search-bar">
+          <span>🔍</span>
+          <span>Search for a service...</span>
+        </div>
+
+        <div class="section-label-sm">Available now near you</div>
+        <div class="cat-row">
+          <button class="cat-tile hot" onclick="navigate('h2', 'Handyman')">
+            <span class="emoji">🔧</span>
+            <div class="name">Handyman</div>
+            <div class="count">8 available</div>
+          </button>
+          <button class="cat-tile" onclick="navigate('h2', 'Lawn & Yard')">
+            <span class="emoji">🌿</span>
+            <div class="name">Lawn & Yard</div>
+            <div class="count">12 available</div>
+          </button>
+          <button class="cat-tile" onclick="navigate('h2', 'Bartender')">
+            <span class="emoji">🍸</span>
+            <div class="name">Bartender</div>
+            <div class="count">5 available</div>
+          </button>
+          <button class="cat-tile" onclick="navigate('h2', 'Moving Help')">
+            <span class="emoji">📦</span>
+            <div class="name">Moving Help</div>
+            <div class="count">6 available</div>
+          </button>
+        </div>
+
+        <div class="section-label-sm" style="margin-top:12px;">Top rated nearby</div>
+        <div class="near-you">
+          <div class="near-card" onclick="navigate('h3', 0)">
+            <div class="worker-avatar" style="background:#1a2030">🧑🏾</div>
+            <div class="near-info">
+              <div class="near-name">Marcus T.</div>
+              <div class="near-meta">⭐ 4.9 · Handyman · 0.8 mi</div>
+              <div class="near-avail">● Available now</div>
+            </div>
+            <div style="font-size:14px;font-weight:800;color:#fff">$45<span style="font-size:11px;color:#555">/hr</span></div>
+          </div>
+          <div class="near-card" onclick="navigate('h3', 1)">
+            <div class="worker-avatar" style="background:#1a2818">👩🏽</div>
+            <div class="near-info">
+              <div class="near-name">Sofia R.</div>
+              <div class="near-meta">⭐ 4.8 · Lawn & Yard · 1.2 mi</div>
+              <div class="near-avail">● Available now</div>
+            </div>
+            <div style="font-size:14px;font-weight:800;color:#fff">$35<span style="font-size:11px;color:#555">/hr</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item active"><span class="nav-icon">🏠</span>Home</button>
+        <button class="nav-item"><span class="nav-icon">🔍</span>Browse</button>
+        <button class="nav-item"><span class="nav-icon">📋</span>My Jobs</button>
+        <button class="nav-item"><span class="nav-icon">👤</span>Profile</button>
+      </div>
+    </div>
+
+    <!-- H2: Worker list -->
+    <div class="screen" id="h2">
+      <div class="screen-content">
+        <div class="app-header">
+          <button class="back-btn" onclick="goBack('h1', 'h2')">←</button>
+          <h2 id="h2-title">Handyman</h2>
+          <div style="width:34px"></div>
+        </div>
+        <div style="padding:0 20px 12px;font-size:13px;color:var(--text3)">8 workers available · East Austin</div>
+
+        <div class="worker-card" onclick="navigate('h3', 0)">
+          <div class="worker-card-top">
+            <div class="wc-avatar" style="background:#1a2030">🧑🏾</div>
+            <div class="wc-info">
+              <div class="wc-name">Marcus T.</div>
+              <div class="wc-skill">Handyman · General repairs</div>
+              <div class="wc-rating">★★★★★ <span>4.9 (127 reviews)</span></div>
+            </div>
+            <div class="wc-right">
+              <div class="wc-rate">$45</div>
+              <div class="wc-rate-label">/hr</div>
+              <div class="wc-dist">📍 0.8 mi</div>
+            </div>
+          </div>
+          <div class="worker-card-bottom">
+            <div class="avail-badge"><span class="avail-dot"></span>Available now</div>
+            <div class="jobs-done">127 jobs done</div>
+          </div>
+        </div>
+
+        <div class="worker-card" onclick="navigate('h3', 1)">
+          <div class="worker-card-top">
+            <div class="wc-avatar" style="background:#1a2818">👩🏽</div>
+            <div class="wc-info">
+              <div class="wc-name">Sofia R.</div>
+              <div class="wc-skill">Lawn & Yard · Mowing, edging</div>
+              <div class="wc-rating">★★★★★ <span>4.8 (89 reviews)</span></div>
+            </div>
+            <div class="wc-right">
+              <div class="wc-rate">$35</div>
+              <div class="wc-rate-label">/hr</div>
+              <div class="wc-dist">📍 1.2 mi</div>
+            </div>
+          </div>
+          <div class="worker-card-bottom">
+            <div class="avail-badge"><span class="avail-dot"></span>Available now</div>
+            <div class="jobs-done">89 jobs done</div>
+          </div>
+        </div>
+
+        <div class="worker-card" onclick="navigate('h3', 2)">
+          <div class="worker-card-top">
+            <div class="wc-avatar" style="background:#2a1520">🧑🏻</div>
+            <div class="wc-info">
+              <div class="wc-name">Jake M.</div>
+              <div class="wc-skill">Moving Help · Loading & hauling</div>
+              <div class="wc-rating">★★★★★ <span>4.7 (203 reviews)</span></div>
+            </div>
+            <div class="wc-right">
+              <div class="wc-rate">$40</div>
+              <div class="wc-rate-label">/hr</div>
+              <div class="wc-dist">📍 2.1 mi</div>
+            </div>
+          </div>
+          <div class="worker-card-bottom">
+            <div class="avail-badge"><span class="avail-dot"></span>Available now</div>
+            <div class="jobs-done">203 jobs done</div>
+          </div>
+        </div>
+
+        <div class="worker-card" onclick="navigate('h3', 3)">
+          <div class="worker-card-top">
+            <div class="wc-avatar" style="background:#1a1830">👩🏻</div>
+            <div class="wc-info">
+              <div class="wc-name">Priya K.</div>
+              <div class="wc-skill">Cleaning · Post-event, move-out</div>
+              <div class="wc-rating">★★★★★ <span>5.0 (56 reviews)</span></div>
+            </div>
+            <div class="wc-right">
+              <div class="wc-rate">$50</div>
+              <div class="wc-rate-label">/hr</div>
+              <div class="wc-dist">📍 0.4 mi</div>
+            </div>
+          </div>
+          <div class="worker-card-bottom">
+            <div class="avail-badge"><span class="avail-dot"></span>Available now</div>
+            <div class="jobs-done">56 jobs done</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item"><span class="nav-icon">🏠</span>Home</button>
+        <button class="nav-item active"><span class="nav-icon">🔍</span>Browse</button>
+        <button class="nav-item"><span class="nav-icon">📋</span>My Jobs</button>
+        <button class="nav-item"><span class="nav-icon">👤</span>Profile</button>
+      </div>
+    </div>
+
+    <!-- H3: Worker profile -->
+    <div class="screen" id="h3">
+      <div class="screen-content" style="padding-top:0">
+        <div style="position:relative">
+          <button class="back-btn" onclick="goBack('h2', 'h3')" style="position:absolute;top:52px;left:16px;z-index:10;background:rgba(0,0,0,0.5)">←</button>
+          <div class="profile-hero">
+            <span id="profile-emoji" style="position:relative;z-index:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5))">🧑🏾</span>
+            <div class="profile-badges">
+              <span class="badge-pill verified">✓ Verified</span>
+              <span class="badge-pill">Background checked</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-main">
+          <div id="profile-name" style="margin-top:16px" class="profile-name">Marcus T.</div>
+          <div id="profile-title" class="profile-title">Handyman · East Austin</div>
+
+          <div class="profile-stats">
+            <div class="stat">
+              <div class="stat-val gold" id="profile-rating">4.9</div>
+              <div class="stat-lbl">Rating</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val" id="profile-jobs">127</div>
+              <div class="stat-lbl">Jobs done</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val green" id="profile-rate">$45</div>
+              <div class="stat-lbl">Per hour</div>
+            </div>
+          </div>
+
+          <div class="profile-section">
+            <h4>About</h4>
+            <p class="profile-bio" id="profile-bio">Former general contractor turned gig worker. I love fixing things — from leaky faucets to building flat-pack furniture. Fast, clean, and I always clean up after myself.</p>
+          </div>
+
+          <div class="profile-section">
+            <h4>Skills</h4>
+            <div class="skill-chips" id="profile-skills">
+              <span class="chip">🔧 General repairs</span>
+              <span class="chip">🚿 Plumbing basics</span>
+              <span class="chip">⚡ Electrical</span>
+              <span class="chip">🪚 Carpentry</span>
+              <span class="chip">🛋️ Assembly</span>
+            </div>
+          </div>
+
+          <div class="profile-section">
+            <h4>Reviews</h4>
+            <div class="review-card">
+              <div class="review-header">
+                <span class="review-avatar">👤</span>
+                <span class="review-name">Tyler B.</span>
+                <span class="review-date">2 days ago</span>
+              </div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-text" id="review1">"Marcus showed up on time, fixed my garbage disposal and patched a hole in the drywall in under 2 hours. Legit the best handyman I've had. Already booked him again."</div>
+            </div>
+            <div class="review-card">
+              <div class="review-header">
+                <span class="review-avatar">👤</span>
+                <span class="review-name">Amanda K.</span>
+                <span class="review-date">1 week ago</span>
+              </div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-text" id="review2">"Needed someone same-day to mount a TV. Marcus was here in 30 min and done in 45. Super professional, very neat. 10/10."</div>
+            </div>
+          </div>
+        </div>
+        <button class="book-btn" id="book-btn" onclick="navigate('h4', null)">Book Marcus — $45/hr</button>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+    <!-- H4: Booking confirm -->
+    <div class="screen" id="h4">
+      <div class="screen-content">
+        <div class="app-header">
+          <button class="back-btn" onclick="goBack('h3', 'h4')">←</button>
+          <h2>Confirm Booking</h2>
+          <div style="width:34px"></div>
+        </div>
+
+        <div class="booking-worker">
+          <div class="avatar" id="confirm-emoji" style="font-size:40px">🧑🏾</div>
+          <div class="info">
+            <div class="name" id="confirm-name">Marcus T.</div>
+            <div class="sub" id="confirm-skill">Handyman</div>
+            <div class="sub" style="margin-top:4px">⭐ 4.9 · 127 jobs</div>
+          </div>
+          <div class="rate" id="confirm-rate">$45/hr</div>
+        </div>
+
+        <div class="address-field">
+          <label>📍 Job Location</label>
+          <p>2847 East 6th St, Austin, TX 78702</p>
+        </div>
+
+        <div class="booking-details">
+          <div style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);margin-bottom:8px;">Job Details</div>
+          <div class="detail-row">
+            <span class="detail-label">Duration estimate</span>
+            <span class="detail-val">2 hours</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Rate</span>
+            <span class="detail-val" id="detail-rate">$45/hr</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Platform fee (18%)</span>
+            <span class="detail-val" id="detail-fee">$16.20</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Estimated total</span>
+            <span class="detail-val" id="detail-total" style="font-size:18px">$106.20</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Estimated arrival</span>
+            <span class="detail-val green">~12 min</span>
+          </div>
+        </div>
+
+        <div style="padding:0 20px;margin-top:8px;font-size:13px;color:var(--text3);line-height:1.5">
+          You're only charged after the job is complete. Cancel anytime before arrival for free.
+        </div>
+
+        <button class="confirm-btn" onclick="navigate('h5', null)">Confirm &amp; Book →</button>
+      </div>
+    </div>
+
+    <!-- H5: Active job / worker en route -->
+    <div class="screen" id="h5">
+      <div class="screen-content" style="padding-top:0;padding-bottom:0">
+        <div class="map-placeholder">
+          <div class="map-grid"></div>
+          <div class="map-worker-dot">🧑🏾</div>
+          <div class="map-you-dot"></div>
+          <div class="map-pin" style="position:relative;z-index:2">📍</div>
+        </div>
+
+        <div style="padding:16px 20px 8px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3)">East 6th St, Austin TX</div>
+          <div style="font-size:20px;font-weight:800;color:var(--text);margin-top:2px" id="worker-en-route">Marcus is on the way</div>
+        </div>
+
+        <div class="eta-card">
+          <div class="eta-left">
+            <div class="eta-label">Arrives in</div>
+            <div class="eta-time" id="eta-countdown">11<span style="font-size:20px;font-weight:600">min</span></div>
+            <div class="eta-sub">0.8 miles away</div>
+          </div>
+          <div class="eta-worker">
+            <div class="av" id="eta-avatar">🧑🏾</div>
+            <div class="wname" id="eta-name">Marcus T.</div>
+            <div class="wrating">⭐ 4.9</div>
+          </div>
+        </div>
+
+        <div class="active-actions">
+          <button class="action-btn">
+            <span class="ab-icon">💬</span>
+            <span class="ab-label">Message</span>
+          </button>
+          <button class="action-btn">
+            <span class="ab-icon">📞</span>
+            <span class="ab-label">Call</span>
+          </button>
+          <button class="action-btn" onclick="navigate('h1', null)">
+            <span class="ab-icon">✕</span>
+            <span class="ab-label">Cancel</span>
+          </button>
+        </div>
+
+        <div style="margin:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:8px">Booked job</div>
+          <div style="font-size:14px;color:var(--text2)">🔧 Handyman · 2 hrs · Est. <span id="job-rate-display" style="color:var(--text);font-weight:700">$106.20</span></div>
+          <div style="font-size:14px;color:var(--text2);margin-top:6px">📍 2847 East 6th St, Austin, TX</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ -->
+    <!-- WORK SCREENS -->
+    <!-- ═══════════════════════════════════ -->
+
+    <!-- W1: Work home -->
+    <div class="screen" id="w1">
+      <div class="screen-content">
+        <div class="work-home-header">
+          <div class="greeting">Welcome back 👋</div>
+          <h2>Carlos V.</h2>
+        </div>
+
+        <div class="toggle-card">
+          <div class="toggle-status on" id="toggle-status-text">● You're on call</div>
+          <button class="big-toggle on" id="big-toggle" onclick="toggleAvailability()">🟢</button>
+          <div class="toggle-desc" id="toggle-desc">You're visible to nearby hirers.<br/>Tap to go off duty.</div>
+        </div>
+
+        <div class="earnings-card">
+          <div class="earn-stat">
+            <div class="earn-label">Today</div>
+            <div class="earn-val">$142</div>
+            <div class="earn-sub">3 jobs done</div>
+          </div>
+          <div class="earn-stat">
+            <div class="earn-label">This week</div>
+            <div class="earn-val">$680</div>
+            <div class="earn-sub">14 jobs</div>
+          </div>
+        </div>
+
+        <div class="section-label-sm">Recent jobs</div>
+        <div class="recent-jobs">
+          <div class="rj-item">
+            <div class="rj-icon">🍸</div>
+            <div class="rj-info">
+              <div class="rj-name">Private event bartender</div>
+              <div class="rj-date">Today · 3 hrs · Travis Heights</div>
+            </div>
+            <div class="rj-pay">+$165</div>
+          </div>
+          <div class="rj-item">
+            <div class="rj-icon">🍸</div>
+            <div class="rj-info">
+              <div class="rj-name">Birthday party bartender</div>
+              <div class="rj-date">Today · 2 hrs · South Congress</div>
+            </div>
+            <div class="rj-pay">+$110</div>
+          </div>
+          <div class="rj-item">
+            <div class="rj-icon">🍸</div>
+            <div class="rj-info">
+              <div class="rj-name">Corporate happy hour</div>
+              <div class="rj-date">Yesterday · 4 hrs · Downtown</div>
+            </div>
+            <div class="rj-pay">+$220</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button class="nav-item active"><span class="nav-icon">🏠</span>Home</button>
+        <button class="nav-item" onclick="navigate('w2', null)"><span class="nav-icon">🔔</span>Jobs</button>
+        <button class="nav-item"><span class="nav-icon">💳</span>Earnings</button>
+        <button class="nav-item"><span class="nav-icon">👤</span>Profile</button>
+      </div>
+    </div>
+
+    <!-- W2: Incoming job ping -->
+    <div class="screen" id="w2">
+      <div class="screen-content ping-screen">
+        <div class="ping-header">
+          <div class="ping-label">⚡ New job request</div>
+          <h2>Job nearby!</h2>
+          <p>0.6 miles · Travis Heights</p>
+        </div>
+
+        <div class="countdown-ring">
+          <svg width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--border)" stroke-width="8"/>
+            <circle id="countdown-circle" cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="8"
+              stroke-dasharray="263.9" stroke-dashoffset="0"
+              stroke-linecap="round"/>
+          </svg>
+          <div class="num" id="countdown-num">30</div>
+        </div>
+
+        <div class="ping-job-card">
+          <div class="pjc-top">
+            <div class="pjc-emoji">🍸</div>
+            <div class="pjc-info">
+              <div class="pjc-type">Event Bartender</div>
+              <div class="pjc-addr">📍 1408 Kenwood Ave, Austin</div>
+            </div>
+            <div class="pjc-pay">
+              <div class="pjc-amount">$165</div>
+              <div class="pjc-est">est. 3 hrs</div>
+            </div>
+          </div>
+          <div class="pjc-row">
+            <div class="pjc-detail">
+              <div class="dlabel">Duration</div>
+              <div class="dval">~3 hours</div>
+            </div>
+            <div class="pjc-detail">
+              <div class="dlabel">Distance</div>
+              <div class="dval">0.6 mi</div>
+            </div>
+            <div class="pjc-detail">
+              <div class="dlabel">Start</div>
+              <div class="dval">Now</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ping-actions">
+          <button class="ping-decline" onclick="goBack('w1', 'w2')">Decline</button>
+          <button class="ping-accept" onclick="navigate('w3', null)">✓ Accept</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- W3: Job accepted / navigate -->
+    <div class="screen" id="w3">
+      <div class="screen-content" style="padding-top:0;padding-bottom:0">
+        <div class="nav-map">
+          <div class="nav-route"></div>
+          <div class="nav-line"></div>
+          <div class="nav-start">🟢</div>
+          <div class="nav-end">📍</div>
+        </div>
+
+        <div style="padding:16px 20px 8px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--green)">Job accepted ✓</div>
+          <div style="font-size:20px;font-weight:800;color:var(--text);margin-top:2px;">Head to the job</div>
+        </div>
+
+        <div class="nav-details">
+          <div class="nav-row">
+            <div class="nav-icon">📍</div>
+            <div class="nav-text">
+              <div class="nlabel">Address</div>
+              <div class="nval">1408 Kenwood Ave, Austin TX 78704</div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <div class="nav-icon">🕐</div>
+            <div class="nav-text">
+              <div class="nlabel">ETA</div>
+              <div class="nval" style="color:var(--green)">~4 min · 0.6 miles</div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <div class="nav-icon">💸</div>
+            <div class="nav-text">
+              <div class="nlabel">Your payout</div>
+              <div class="nval" style="color:var(--green)">$165 after job complete</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="client-card">
+          <div class="cav">👤</div>
+          <div class="cinfo">
+            <div class="cname">Rachel M.</div>
+            <div class="cjob">🍸 Event Bartender · 3 hrs</div>
+          </div>
+          <button class="chat-btn">💬 Chat</button>
+        </div>
+
+        <button class="arrived-btn" onclick="navigate('w4', null)">Mark as Arrived</button>
+        <div style="height:20px"></div>
+      </div>
+    </div>
+
+    <!-- W4: Job complete -->
+    <div class="screen" id="w4">
+      <div class="screen-content">
+        <div class="complete-screen">
+          <div class="big-check">🎉</div>
+          <h2>Job Complete!</h2>
+          <p>Nice work. Your payout is on the way.</p>
+
+          <div class="payout-card">
+            <div class="payout-label">Your payout</div>
+            <div class="payout-amount">$135</div>
+            <div class="payout-sub">Arrives in your account within 2 hours</div>
+            <div class="payout-breakdown">
+              <div class="pb-row"><span class="pbl">Job total</span><span class="pbv">$165.00</span></div>
+              <div class="pb-row"><span class="pbl">Platform fee (18%)</span><span class="pbv" style="color:rgba(239,68,68,0.7)">-$29.70</span></div>
+              <div class="pb-row"><span class="pbl" style="color:rgba(34,197,94,0.8)">Your take</span><span class="pbv" style="font-weight:900;font-size:15px">$135.30</span></div>
+            </div>
+          </div>
+
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px;text-align:left">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text3);margin-bottom:8px">Rate Rachel M.</div>
+            <div style="font-size:28px;letter-spacing:4px;color:var(--yellow)">★★★★★</div>
+          </div>
+
+          <button class="done-btn" onclick="navigate('w1', null)">← Back to Home</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end screen-container -->
+</div><!-- end phone -->
+
+<div class="demo-tip">Tap any card or button to navigate · Switch modes above</div>
+
+<script>
+  let currentScreen = 'h1';
+  let currentMode = 'hire';
+  let countdownInterval = null;
+  let etaInterval = null;
+  let isOn = true;
+
+  const workers = [
+    {
+      emoji: '🧑🏾', name: 'Marcus T.', title: 'Handyman · East Austin',
+      rating: '4.9', jobs: '127', rate: '$45',
+      bio: 'Former general contractor turned gig worker. I love fixing things — from leaky faucets to building flat-pack furniture. Fast, clean, and I always clean up after myself.',
+      skills: ['🔧 General repairs', '🚿 Plumbing basics', '⚡ Electrical', '🪚 Carpentry', '🛋️ Assembly'],
+      r1: '"Marcus showed up on time, fixed my garbage disposal and patched a hole in drywall in under 2 hours. Best handyman I\'ve had. Already booked him again."',
+      r2: '"Same-day TV mount. Here in 30 min, done in 45. Super professional. 10/10."',
+      bookLabel: 'Book Marcus — $45/hr',
+      fee: '$16.20', total: '$106.20'
+    },
+    {
+      emoji: '👩🏽', name: 'Sofia R.', title: 'Lawn & Yard · North Loop',
+      rating: '4.8', jobs: '89', rate: '$35',
+      bio: 'I\'ve been doing lawn care in Austin for 4 years. I bring all my own equipment and leave your yard looking better than I found it. I also do edging, mulching, and leaf cleanup.',
+      skills: ['🌿 Mowing', '✂️ Edging', '🍂 Leaf cleanup', '🌱 Planting', '💦 Sprinkler basics'],
+      r1: '"Sofia does an incredible job. My lawn has never looked better. She\'s fast, thorough, and shows up when she says she will."',
+      r2: '"Hired Sofia same day for a yard cleanup before my party. Arrived in 20 min. Absolute lifesaver."',
+      bookLabel: 'Book Sofia — $35/hr',
+      fee: '$12.60', total: '$82.60'
+    },
+    {
+      emoji: '🧑🏻', name: 'Jake M.', title: 'Moving Help · Mueller',
+      rating: '4.7', jobs: '203', rate: '$40',
+      bio: 'Strong back, careful hands. I\'ve helped over 200 Austin families move. I treat your stuff like it\'s my own. I bring straps, blankets, and a good attitude.',
+      skills: ['📦 Loading & unloading', '🚚 Truck assistance', '🛋️ Furniture moving', '📦 Packing help', '🏠 Staging'],
+      r1: '"Jake helped us move a 3-bedroom apartment in 4 hours. He was careful with all our furniture and nothing got scratched. Highly recommend."',
+      r2: '"Needed help moving a couch up 3 flights of stairs. Jake was there in 25 minutes and made it look easy."',
+      bookLabel: 'Book Jake — $40/hr',
+      fee: '$14.40', total: '$94.40'
+    },
+    {
+      emoji: '👩🏻', name: 'Priya K.', title: 'Cleaning · South Lamar',
+      rating: '5.0', jobs: '56', rate: '$50',
+      bio: 'Detail-obsessed cleaner specializing in post-event and move-out cleans. I bring eco-friendly products and leave no corner untouched. Perfect score, every time.',
+      skills: ['🧹 Deep cleaning', '🏠 Move-out prep', '🎉 Post-event cleanup', '🪟 Windows', '🛁 Bathrooms'],
+      r1: '"Priya cleaned our Airbnb after a rough guest. It looked brand new. She has a perfect rating for a reason — she is literally perfect."',
+      r2: '"Post-party cleanup. 4 hours, 3 bedrooms, 2 bathrooms. Everything spotless. She even reorganized our pantry. 10/10."',
+      bookLabel: 'Book Priya — $50/hr',
+      fee: '$18.00', total: '$118.00'
+    }
+  ];
+
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('hire-tab').className = mode === 'hire' ? 'mode-btn active-hire' : 'mode-btn';
+    document.getElementById('work-tab').className = mode === 'work' ? 'mode-btn active-work' : 'mode-btn';
+
+    const targetScreen = mode === 'hire' ? 'h1' : 'w1';
+    const allScreens = document.querySelectorAll('.screen');
+    allScreens.forEach(s => { s.className = 'screen'; });
+    document.getElementById(targetScreen).className = 'screen active';
+    currentScreen = targetScreen;
+
+    if (mode === 'work') startPingCountdown();
+  }
+
+  function navigate(to, workerIdx) {
+    if (workerIdx !== null && workerIdx !== undefined) {
+      loadWorkerProfile(workerIdx);
+    }
+
+    const from = currentScreen;
+    const fromEl = document.getElementById(from);
+    const toEl = document.getElementById(to);
+
+    fromEl.classList.add('exit');
+    setTimeout(() => {
+      fromEl.className = 'screen';
+    }, 320);
+    toEl.className = 'screen active';
+    currentScreen = to;
+
+    if (to === 'h2') updateH2Title();
+    if (to === 'h5') startEtaCountdown();
+    if (to === 'w2') startPingCountdown();
+  }
+
+  function goBack(to, from) {
+    const fromEl = document.getElementById(from);
+    const toEl = document.getElementById(to);
+    fromEl.style.transform = 'translateX(100%)';
+    fromEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.2,1)';
+    toEl.className = 'screen active';
+    setTimeout(() => {
+      fromEl.className = 'screen';
+      fromEl.style.transform = '';
+      fromEl.style.transition = '';
+    }, 320);
+    currentScreen = to;
+  }
+
+  let selectedCat = 'Handyman';
+  function updateH2Title() {
+    document.getElementById('h2-title').textContent = selectedCat;
+  }
+
+  const origNavigate = navigate;
+
+  function loadWorkerProfile(idx) {
+    const w = workers[idx];
+    document.getElementById('profile-emoji').textContent = w.emoji;
+    document.getElementById('profile-name').textContent = w.name;
+    document.getElementById('profile-title').textContent = w.title;
+    document.getElementById('profile-rating').textContent = w.rating;
+    document.getElementById('profile-jobs').textContent = w.jobs;
+    document.getElementById('profile-rate').textContent = w.rate;
+    document.getElementById('profile-bio').textContent = w.bio;
+    document.getElementById('review1').textContent = w.r1;
+    document.getElementById('review2').textContent = w.r2;
+    document.getElementById('book-btn').textContent = w.bookLabel;
+    const chips = document.getElementById('profile-skills');
+    chips.innerHTML = w.skills.map(s => `<span class="chip">${s}</span>`).join('');
+
+    // Confirm screen
+    document.getElementById('confirm-emoji').textContent = w.emoji;
+    document.getElementById('confirm-name').textContent = w.name;
+    document.getElementById('confirm-skill').textContent = w.title.split(' · ')[0];
+    document.getElementById('confirm-rate').textContent = w.rate + '/hr';
+    document.getElementById('detail-rate').textContent = w.rate + '/hr';
+    document.getElementById('detail-fee').textContent = w.fee;
+    document.getElementById('detail-total').textContent = w.total;
+
+    // Active job screen
+    document.getElementById('worker-en-route').textContent = w.name.split(' ')[0] + ' is on the way';
+    document.getElementById('eta-avatar').textContent = w.emoji;
+    document.getElementById('eta-name').textContent = w.name;
+    document.getElementById('job-rate-display').textContent = w.total;
+
+    book_btn_worker = idx;
+  }
+
+  // Override navigate to capture category selection
+  const catTiles = document.querySelectorAll('.cat-tile');
+
+  // ETA countdown
+  let etaVal = 11;
+  function startEtaCountdown() {
+    clearInterval(etaInterval);
+    etaVal = 11;
+    document.getElementById('eta-countdown').innerHTML = etaVal + '<span style="font-size:20px;font-weight:600">min</span>';
+    etaInterval = setInterval(() => {
+      if (etaVal > 1) {
+        etaVal--;
+        document.getElementById('eta-countdown').innerHTML = etaVal + '<span style="font-size:20px;font-weight:600">min</span>';
+      }
+    }, 3000);
+  }
+
+  // Ping countdown
+  let pingVal = 30;
+  function startPingCountdown() {
+    clearInterval(countdownInterval);
+    pingVal = 30;
+    const circle = document.getElementById('countdown-circle');
+    const numEl = document.getElementById('countdown-num');
+    if (!circle || !numEl) return;
+    const circumference = 263.9;
+    circle.style.strokeDashoffset = 0;
+    numEl.textContent = pingVal;
+
+    countdownInterval = setInterval(() => {
+      pingVal--;
+      if (pingVal <= 0) {
+        clearInterval(countdownInterval);
+        pingVal = 0;
+      }
+      numEl.textContent = pingVal;
+      const progress = (30 - pingVal) / 30;
+      circle.style.strokeDashoffset = progress * circumference;
+    }, 1000);
+  }
+
+  // Availability toggle
+  function toggleAvailability() {
+    isOn = !isOn;
+    const btn = document.getElementById('big-toggle');
+    const status = document.getElementById('toggle-status-text');
+    const desc = document.getElementById('toggle-desc');
+
+    if (isOn) {
+      btn.className = 'big-toggle on';
+      btn.textContent = '🟢';
+      status.className = 'toggle-status on';
+      status.textContent = '● You\'re on call';
+      desc.textContent = 'You\'re visible to nearby hirers.\nTap to go off duty.';
+    } else {
+      btn.className = 'big-toggle off';
+      btn.textContent = '⚫';
+      status.className = 'toggle-status off';
+      status.textContent = '○ You\'re off duty';
+      desc.textContent = 'Hirers can\'t see you right now.\nTap to go on call.';
+    }
+  }
+
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    const h = now.getHours() % 12 || 12;
+    const m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('clock').textContent = `${h}:${m}`;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+
+  // Wire up category tiles to set title
+  document.querySelectorAll('.cat-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      selectedCat = tile.querySelector('.name').textContent;
+    });
+  });
+</script>
+
+</body>
+</html>
