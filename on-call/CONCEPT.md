@@ -49,37 +49,35 @@ Users choose one role at signup (switchable later):
 
 ---
 
-## Job Categories (Launch Scope)
+## Job Categories
 
-### Outdoor / Seasonal
+### 🚀 Austin Beta Launch (Tier 1 — Day 1)
+These five cover Austin's three biggest demand triggers: new homeownership, events, and constant moving. Workers frequently overlap across categories (same person = more supply density).
+
+- 🌿 **Lawn & yard work** — year-round growing season, HOA pressure, new homeowners everywhere
+- 🔧 **Handyman** — construction boom = punch lists, fixes, installs
+- 🍸 **Event bartender / server** — SXSW, ACL, F1, private parties, 250+ venues
+- 📦 **Moving help** — Austin is the most moved-into city in the US
+- 🧹 **Cleaning (post-event / move-out)** — ties directly to event + moving demand
+
+### 🟠 Tier 2 — Add in Months 2–3 (Austin)
+- 🏊 Pool service / maintenance — huge % of Austin homes have pools
+- 💦 Pressure washing — limestone dust + humidity = constant demand
+- 🛋️ Furniture assembly — new residents, online furniture culture
+- 🚗 Mobile car detailing — truck/SUV culture, high willingness to pay
+- 💪 Personal trainer / fitness — Austin is obsessively health-conscious
+
+### 🟡 Tier 3 — Expand with Scale
+- 🐕 Dog walking / pet sitting
+- 📚 Tutoring / academic help (UT Austin + high schools)
+- 📸 Event / headshot photography
+- 💻 Tech help (setup, wifi, printers)
+
+### 🌎 National Expansion Categories (Post-Austin)
 - ❄️ Snow removal / shoveling
-- 🚗 Car wash / detailing (mobile)
-- 🌿 Lawn care / leaf blowing
-
-### Sports & Leisure
 - ⛷️ Ski instructor
 - ⛳ Caddy
-- 🎾 Tennis / pickleball ball machine operator
-
-### Events & Hospitality
-- 🍸 Bartender (private events)
-- 🍽️ Event server / catering help
-- 🎉 Party setup / cleanup
-
-### Home Services
-- 🔧 Handyman
-- 🪟 Window cleaning
-- 🧹 Post-event / move-out cleaning
-- 🚚 Furniture moving / hauling
-
-### Transportation & Lessons
-- 🚗 Driving instructor (learner's permit)
-- 🚲 Bike mechanic (mobile)
-
-### Other
-- 📦 Assembly (IKEA-style)
-- 🐕 Dog walker
-- 💻 Basic tech help (setup, wifi, printer)
+- 🚗 Driving instructor
 
 ---
 
@@ -142,6 +140,10 @@ This builds **trust before the booking** — critical for letting a stranger int
 > **Bookings completed per active user per month** (both sides)
 
 ---
+
+## Beta Launch Market
+**City:** Austin, TX (beta)
+**Rationale:** Fastest-growing US city, extreme weather demand spikes, massive event scene (SXSW/ACL/F1), construction boom driving homeowner demand, UT Austin supplying young workers seeking flexible income.
 
 ## Status
 🟡 Concept Stage — ideas being captured, no dev started yet.
