@@ -215,34 +215,8 @@ This is a starting point. Add your own conventions, style, and rules as you figu
 
 Agency agents live at: `/home/node/.openclaw/workspace/agency-agents/`
 
-**Before every task, read the most relevant agent file and embody that persona.** The agent gets full access to all tools available to me.
+**Before every task, read the most relevant agent file and embody that persona.** Agent routing is handled by the `agency-agents` skill — consult it to find the right file for the task.
 
-### Agent Directory
-
-| Task Type | Agent File |
-|---|---|
-| UI/visual design, layouts, components | `design/design-ui-designer.md` |
-| Brand consistency, colors, tone | `design/design-brand-guardian.md` |
-| User experience, flows, friction | `design/design-ux-researcher.md` |
-| Visual storytelling, imagery | `design/design-visual-storyteller.md` |
-| Frontend HTML/CSS/JS | `engineering/engineering-frontend-developer.md` |
-| Backend, APIs, servers | `engineering/engineering-backend-architect.md` |
-| DevOps, nginx, deployments | `engineering/engineering-devops-automator.md` |
-| Performance, optimization | `engineering/engineering-senior-developer.md` |
-| Security audits | `engineering/engineering-security-engineer.md` |
-| TikTok strategy + content | `marketing/marketing-tiktok-strategist.md` |
-| Instagram strategy + content | `marketing/marketing-instagram-curator.md` |
-| Growth, funnels, conversions | `marketing/marketing-growth-hacker.md` |
-| Content writing, copy | `marketing/marketing-content-creator.md` |
-| Social media strategy | `marketing/marketing-social-media-strategist.md` |
-| Product features, roadmap | `product/product-sprint-prioritizer.md` |
-| Behavioral design, nudges | `product/product-behavioral-nudge-engine.md` |
-| Analytics, reporting | `support/support-analytics-reporter.md` |
-| Finance tracking | `support/support-finance-tracker.md` |
-| Accessibility audits | `testing/testing-accessibility-auditor.md` |
-| Performance benchmarking | `testing/testing-performance-benchmarker.md` |
-
-### Rules
 - Always read the agent file before starting the task
 - Fully embody the persona — tone, priorities, standards
 - Agent has the same tool access as the main session

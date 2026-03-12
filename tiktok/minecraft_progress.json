@@ -5,10 +5,33 @@
   "note": "Minecraft parkour 1080p60, vertical. Re-download if file missing from /tmp after VPS reboot.",
   "download_command": "yt-dlp --cookies /root/yt_cookies.txt --no-js-runtimes --js-runtimes node --extractor-args 'youtube:player_client=mediaconnect' -f '299+140' -o '/tmp/tiktok-video/minecraft_real.mp4' 'https://www.youtube.com/watch?v=7yl7Wc1dtWc'",
   "used_segments": [
-    {"video": "tiktok_v3.mp4", "start": 120, "end": 142},
-    {"video": "tiktok_v4.mp4", "start": 300, "end": 322}
+    {
+      "video": "tiktok_v3.mp4",
+      "start": 120,
+      "end": 142
+    },
+    {
+      "video": "tiktok_v4.mp4",
+      "start": 300,
+      "end": 322
+    },
+    {
+      "video": "tiktok_v5.mp4",
+      "start": 340,
+      "end": 368.82
+    },
+    {
+      "video": "tiktok_v6.mp4",
+      "start": 373.82,
+      "end": 399.44
+    },
+    {
+      "video": "tiktok_v7.mp4",
+      "start": 404.44,
+      "end": 431.73
+    }
   ],
-  "next_start": 340,
+  "next_start": 436.73,
   "seconds_per_video_avg": 25,
   "estimated_videos_remaining": 14
 }

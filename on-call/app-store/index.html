@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>On Call — App Store Screenshots</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #FF5C00;
+      --blue: #3B82F6;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+      --bg-dark: #0a0a0a;
+      --surface: #111;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #fff;
+      --text2: #aaa;
+      --text3: #555;
+      --card: #161616;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0d0d0d;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* ── Gallery layout ── */
+    .gallery-title {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 40px;
+    }
+    .gallery-title h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .gallery-title p { font-size: 13px; color: #555; margin-top: 6px; }
+
+    .gallery {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Each screenshot card ── */
+    .shot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .shot-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #444;
+    }
+
+    /* iPhone 14 Pro frame — 390×844 logical */
+    .iphone {
+      width: 390px;
+      height: 844px;
+      background: #0a0a0a;
+      border-radius: 54px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 2px #2a2a2a,
+        0 0 0 5px #111,
+        0 40px 100px rgba(0,0,0,0.8),
+        inset 0 0 0 1px rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    /* Dynamic island */
+    .iphone::before {
+      content: '';
+      position: absolute;
+      top: 12px; left: 50%; transform: translateX(-50%);
+      width: 126px; height: 36px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 50;
+    }
+    /* Home bar */
+    .iphone::after {
+      content: '';
+      position: absolute;
+      bottom: 10px; left: 50%; transform: translateX(-50%);
+      width: 130px; height: 5px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 3px;
+      z-index: 50;
+    }
+
+    /* Status bar */
+    .sbar {
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 56px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      padding: 0 28px 8px;
+      z-index: 40;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .sbar-icons { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+
+    /* ── Bottom nav bar (shared) ── */
+    .bnav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 88px;
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid #1e1e1e;
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 8px 24px;
+      z-index: 30;
+    }
+    .bnav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; color: #444;
+    }
+    .bnav-item.active { color: var(--accent); }
+    .bnav-item span { font-size: 24px; }
+
+    /* ── SCREEN 1: Discover Workers ── */
+    .s1 { background: var(--bg-dark); }
+
+    .s1-top {
+      padding: 60px 22px 0;
+    }
+    .s1-hey { font-size: 14px; color: var(--text2); font-weight: 500; }
+    .s1-title { font-size: 30px; font-weight: 900; color: #fff; letter-spacing: -1px; margin-top: 4px; line-height: 1.1; }
+    .s1-title em { color: var(--accent); font-style: normal; }
+
+    .s1-search {
+      margin: 18px 22px 0;
+      background: #181818;
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 13px 16px;
+      display: flex; align-items: center; gap: 10px;
+      color: #444; font-size: 15px;
+    }
+
+    .s1-section { padding: 20px 22px 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #444; }
+
+    .s1-cats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; padding: 0 22px;
+    }
+    .s1-cat {
+      background: var(--card);
+      border: 1px solid #1e1e1e;
+      border-radius: 16px; padding: 18px 16px;
+    }
+    .s1-cat.hot { border-color: rgba(255,92,0,0.25); background: linear-gradient(135deg, #1a0e06, #111); }
+    .s1-cat-emoji { font-size: 28px; margin-bottom: 8px; }
+    .s1-cat-name { font-size: 14px; font-weight: 700; color: #fff; }
+    .s1-cat-count { font-size: 12px; color: #555; margin-top: 2px; }
+
+    .s1-nearby { padding: 0 22px; margin-top: 12px; }
+    .s1-near-card {
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 14px; padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 10px;
+    }
+    .s1-av { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .s1-ninfo { flex: 1; }
+    .s1-nname { font-size: 15px; font-weight: 700; color: #fff; }
+    .s1-nmeta { font-size: 12px; color: #666; margin-top: 2px; }
+    .s1-navail { font-size: 11px; font-weight: 700; color: var(--green); margin-top: 3px; }
+    .s1-nrate { font-size: 15px; font-weight: 800; color: #fff; }
+
+    /* ── SCREEN 2: Worker Profile ── */
+    .s2 { background: var(--bg-dark); }
+
+    .s2-hero {
+      height: 230px;
+      background: linear-gradient(180deg, #1a1f33 0%, var(--bg-dark) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 90px;
+      position: relative;
+    }
+    .s2-badges {
+      position: absolute; bottom: 14px; right: 18px;
+      display: flex; gap: 6px;
+    }
+    .s2-badge {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; color: #fff;
+    }
+    .s2-badge.v { color: var(--green); border-color: rgba(34,197,94,0.3); }
+    .s2-back {
+      position: absolute; top: 58px; left: 18px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px;
+    }
+
+    .s2-main { padding: 0 22px; }
+    .s2-name { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: -0.5px; margin-top: 14px; }
+    .s2-title { font-size: 15px; color: #777; margin-top: 3px; }
+    .s2-stats {
+      display: flex;
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 14px; margin: 16px 0; overflow: hidden;
+    }
+    .s2-stat { flex: 1; padding: 14px 0; text-align: center; border-right: 1px solid #1e1e1e; }
+    .s2-stat:last-child { border-right: none; }
+    .s2-sval { font-size: 22px; font-weight: 900; color: #fff; }
+    .s2-sval.gold { color: var(--yellow); }
+    .s2-sval.green { color: var(--green); }
+    .s2-slbl { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    .s2-bio { font-size: 14px; color: #888; line-height: 1.6; margin-bottom: 16px; }
+    .s2-skills { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+    .s2-chip {
+      background: #181818; border: 1px solid #222;
+      padding: 6px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; color: #999;
+    }
+    .s2-review {
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    }
+    .s2-rh { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .s2-rav { font-size: 20px; }
+    .s2-rn { font-size: 13px; font-weight: 700; color: #fff; }
+    .s2-rd { font-size: 11px; color: #444; margin-left: auto; }
+    .s2-rs { color: var(--yellow); font-size: 12px; margin-bottom: 4px; }
+    .s2-rt { font-size: 13px; color: #777; line-height: 1.5; }
+
+    .s2-bookbtn {
+      position: sticky; bottom: 95px;
+      margin: 10px 0;
+      padding: 17px;
+      background: var(--blue);
+      color: #fff; font-size: 16px; font-weight: 800;
+      border-radius: 16px; text-align: center;
+      box-shadow: 0 8px 28px rgba(59,130,246,0.4);
+    }
+
+    /* ── SCREEN 3: Booking Confirm ── */
+    .s3 { background: var(--bg-dark); }
+
+    .s3-header {
+      padding: 62px 22px 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .s3-back { width: 36px; height: 36px; background: #181818; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
+    .s3-htitle { font-size: 22px; font-weight: 800; color: #fff; }
+
+    .s3-wcard {
+      margin: 0 22px 16px;
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 18px; padding: 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .s3-wav { font-size: 42px; }
+    .s3-winfo { flex: 1; }
+    .s3-wname { font-size: 19px; font-weight: 800; color: #fff; }
+    .s3-wsub { font-size: 13px; color: #666; margin-top: 3px; }
+    .s3-wrate { font-size: 17px; font-weight: 800; color: #fff; }
+
+    .s3-addr {
+      margin: 0 22px 14px;
+      background: #181818; border: 1px solid #222;
+      border-radius: 14px; padding: 14px 16px;
+    }
+    .s3-albl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #444; }
+    .s3-aval { font-size: 15px; font-weight: 600; color: #fff; margin-top: 4px; }
+
+    .s3-details { padding: 0 22px; }
+    .s3-dlbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #444; margin-bottom: 8px; }
+    .s3-drow {
+      display: flex; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid #1a1a1a;
+      font-size: 14px;
+    }
+    .s3-drow:last-child { border-bottom: none; }
+    .s3-dleft { color: #777; }
+    .s3-dright { font-weight: 700; color: #fff; }
+    .s3-dright.green { color: var(--green); }
+    .s3-dright.big { font-size: 18px; }
+
+    .s3-note { margin: 12px 22px; font-size: 13px; color: #444; line-height: 1.5; }
+
+    .s3-cbtn {
+      margin: 10px 22px;
+      padding: 17px;
+      background: var(--blue);
+      color: #fff; font-size: 16px; font-weight: 800;
+      border-radius: 16px; text-align: center;
+      box-shadow: 0 8px 28px rgba(59,130,246,0.4);
+    }
+
+    /* ── SCREEN 4: Worker En Route ── */
+    .s4 { background: var(--bg-dark); }
+
+    .s4-map {
+      height: 250px;
+      background: linear-gradient(135deg, #0f1929, #0a1122);
+      position: relative; overflow: hidden;
+    }
+    .s4-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.07) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .s4-road-h {
+      position: absolute;
+      background: rgba(59,130,246,0.12); border-radius: 4px;
+    }
+    .s4-worker-dot {
+      position: absolute; bottom: 65px; left: 90px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 0 8px rgba(59,130,246,0.2);
+      z-index: 2;
+    }
+    .s4-you-dot {
+      position: absolute; top: 80px; right: 80px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 5px rgba(255,255,255,0.15);
+      z-index: 2;
+    }
+    .s4-pin { position: absolute; top: 80px; right: 66px; font-size: 30px; z-index: 2; transform: translate(50%, -100%); }
+
+    .s4-info { padding: 16px 22px 10px; }
+    .s4-slbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #444; }
+    .s4-stitle { font-size: 22px; font-weight: 800; color: #fff; margin-top: 3px; }
+
+    .s4-eta {
+      margin: 0 22px 14px;
+      background: var(--blue);
+      border-radius: 18px; padding: 20px 22px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .s4-eta-lbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.6); }
+    .s4-eta-time { font-size: 44px; font-weight: 900; color: #fff; letter-spacing: -2px; line-height: 1; }
+    .s4-eta-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+    .s4-worker { text-align: center; }
+    .s4-wav { font-size: 40px; }
+    .s4-wname { font-size: 14px; font-weight: 700; color: #fff; margin-top: 4px; }
+    .s4-wrating { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+    .s4-actions {
+      display: flex; gap: 10px; padding: 0 22px; margin-bottom: 14px;
+    }
+    .s4-abtn {
+      flex: 1; padding: 14px 8px;
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+    }
+    .s4-abtn-icon { font-size: 24px; }
+    .s4-abtn-lbl { font-size: 11px; font-weight: 600; color: #666; }
+
+    .s4-job-summary {
+      margin: 0 22px;
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 14px; padding: 14px;
+    }
+    .s4-jlbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #444; margin-bottom: 8px; }
+    .s4-jrow { font-size: 14px; color: #777; margin-bottom: 6px; }
+    .s4-jrow strong { color: #fff; }
+
+    /* ── SCREEN 5: Work Mode — Job Ping ── */
+    .s5 { background: var(--bg-dark); }
+
+    .s5-top { padding: 70px 22px 24px; text-align: center; }
+    .s5-badge {
+      display: inline-block;
+      background: rgba(255,92,0,0.1); border: 1px solid rgba(255,92,0,0.2);
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; color: var(--accent);
+      margin-bottom: 16px; letter-spacing: 0.5px;
+    }
+    .s5-title { font-size: 30px; font-weight: 900; color: #fff; letter-spacing: -1px; }
+    .s5-sub { font-size: 15px; color: #666; margin-top: 6px; }
+
+    .s5-ring { width: 110px; height: 110px; position: relative; margin: 0 auto 22px; }
+    .s5-ring svg { transform: rotate(-90deg); }
+    .s5-ring .num {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 900; color: var(--accent);
+    }
+
+    .s5-job {
+      margin: 0 22px 18px;
+      background: var(--card); border: 1px solid #1e1e1e;
+      border-radius: 18px; overflow: hidden;
+    }
+    .s5-jtop {
+      padding: 18px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .s5-jemoji {
+      width: 54px; height: 54px; background: #181818; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 30px;
+      flex-shrink: 0;
+    }
+    .s5-jinfo { flex: 1; }
+    .s5-jtype { font-size: 19px; font-weight: 800; color: #fff; }
+    .s5-jaddr { font-size: 13px; color: #666; margin-top: 3px; }
+    .s5-jpay { text-align: right; }
+    .s5-jamt { font-size: 26px; font-weight: 900; color: var(--green); }
+    .s5-jest { font-size: 11px; color: #444; }
+
+    .s5-jrow {
+      border-top: 1px solid #1a1a1a;
+      display: flex;
+    }
+    .s5-jd { flex: 1; padding: 12px 16px; border-right: 1px solid #1a1a1a; }
+    .s5-jd:last-child { border-right: none; }
+    .s5-jdlbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #444; }
+    .s5-jdval { font-size: 14px; font-weight: 700; color: #fff; margin-top: 3px; }
+
+    .s5-actions { display: flex; gap: 12px; padding: 0 22px; }
+    .s5-decline {
+      flex: 1; padding: 17px;
+      background: #181818; border: 1px solid #222;
+      border-radius: 16px; font-size: 16px; font-weight: 700; color: #666;
+      text-align: center;
+    }
+    .s5-accept {
+      flex: 2; padding: 17px;
+      background: var(--green);
+      border-radius: 16px; font-size: 16px; font-weight: 800; color: #fff;
+      text-align: center;
+      box-shadow: 0 8px 28px rgba(34,197,94,0.35);
+    }
+
+    /* ── Marketing overlay ── */
+    .mkt-banner {
+      position: absolute;
+      left: 0; right: 0;
+      z-index: 45;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+    }
+    .mkt-banner.top { top: 62px; }
+    .mkt-banner.bottom { bottom: 95px; }
+
+    .mkt-banner .headline {
+      font-size: 30px; font-weight: 900; color: #fff;
+      letter-spacing: -1px; line-height: 1.1;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      padding: 0 20px;
+    }
+    .mkt-banner .headline em { color: var(--accent); font-style: normal; }
+    .mkt-banner .sub-headline {
+      font-size: 14px; color: rgba(255,255,255,0.6);
+      margin-top: 6px; padding: 0 30px; line-height: 1.4;
+    }
+
+    /* Pill tag */
+    .mkt-pill {
+      background: var(--accent);
+      color: #fff; font-size: 11px; font-weight: 800;
+      padding: 5px 14px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    .mkt-pill.green { background: var(--green); }
+    .mkt-pill.blue { background: var(--blue); }
+  </style>
+</head>
+<body>
+
+<div class="gallery-title">
+  <h1>ON CALL — App Store Screenshots</h1>
+  <p>5 screens · iPhone 14 Pro · 390×844</p>
+</div>
+
+<div class="gallery">
+
+  <!-- ── SCREENSHOT 1: Discover ── -->
+  <div class="shot-wrap">
+    <div class="shot-label">1 — Discover</div>
+    <div class="iphone">
+      <div class="sbar">
+        <span>9:41</span>
+        <div class="sbar-icons">
+          <span>●●●</span><span>WiFi</span><span>🔋</span>
+        </div>
+      </div>
+
+      <!-- Marketing overlay -->
+      <div class="mkt-banner bottom" style="bottom:94px;background:linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.95) 60%, transparent 100%);padding:20px 0 20px">
+        <div class="mkt-pill">Hire Mode</div>
+        <div class="headline">Skilled help,<br/><em>right now.</em></div>
+        <div class="sub-headline">Browse verified workers nearby and book in under 60 seconds.</div>
+      </div>
+
+      <!-- Screen content -->
+      <div class="s1" style="position:absolute;inset:0;overflow:hidden">
+        <div class="s1-top">
+          <div class="s1-hey">Good morning 👋</div>
+          <div class="s1-title">What do you need<br/>done <em>today?</em></div>
+          <div class="s1-search">
+            <span>🔍</span>
+            <span>Search for a service...</span>
+          </div>
+        </div>
+
+        <div class="s1-section">Available now near you</div>
+        <div class="s1-cats">
+          <div class="s1-cat hot">
+            <div class="s1-cat-emoji">🔧</div>
+            <div class="s1-cat-name">Handyman</div>
+            <div class="s1-cat-count">8 available</div>
+          </div>
+          <div class="s1-cat">
+            <div class="s1-cat-emoji">🌿</div>
+            <div class="s1-cat-name">Lawn & Yard</div>
+            <div class="s1-cat-count">12 available</div>
+          </div>
+          <div class="s1-cat">
+            <div class="s1-cat-emoji">🍸</div>
+            <div class="s1-cat-name">Bartender</div>
+            <div class="s1-cat-count">5 available</div>
+          </div>
+          <div class="s1-cat">
+            <div class="s1-cat-emoji">📦</div>
+            <div class="s1-cat-name">Moving Help</div>
+            <div class="s1-cat-count">6 available</div>
+          </div>
+        </div>
+
+        <div class="s1-section">Top rated nearby</div>
+        <div class="s1-nearby">
+          <div class="s1-near-card">
+            <div class="s1-av" style="background:#1a2030">🧑🏾</div>
+            <div class="s1-ninfo">
+              <div class="s1-nname">Marcus T.</div>
+              <div class="s1-nmeta">⭐ 4.9 · Handyman · 0.8 mi</div>
+              <div class="s1-navail">● Available now</div>
+            </div>
+            <div class="s1-nrate">$45<span style="font-size:11px;color:#555">/hr</span></div>
+          </div>
+          <div class="s1-near-card">
+            <div class="s1-av" style="background:#1a2818">👩🏽</div>
+            <div class="s1-ninfo">
+              <div class="s1-nname">Sofia R.</div>
+              <div class="s1-nmeta">⭐ 4.8 · Lawn & Yard · 1.2 mi</div>
+              <div class="s1-navail">● Available now</div>
+            </div>
+            <div class="s1-nrate">$35<span style="font-size:11px;color:#555">/hr</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bnav">
+        <div class="bnav-item active"><span>🏠</span>Home</div>
+        <div class="bnav-item"><span>🔍</span>Browse</div>
+        <div class="bnav-item"><span>📋</span>My Jobs</div>
+        <div class="bnav-item"><span>👤</span>Profile</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREENSHOT 2: Worker Profile ── -->
+  <div class="shot-wrap">
+    <div class="shot-label">2 — Worker Profile</div>
+    <div class="iphone">
+      <div class="sbar">
+        <span>9:41</span>
+        <div class="sbar-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+
+      <div class="mkt-banner bottom" style="bottom:94px;background:linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.95) 60%, transparent 100%);padding:20px 0 20px">
+        <div class="mkt-pill blue">Rich Profiles</div>
+        <div class="headline">Know before<br/>you <em>book.</em></div>
+        <div class="sub-headline">Reviews, skills, ratings, and response time — all before you commit.</div>
+      </div>
+
+      <div class="s2" style="position:absolute;inset:0;overflow:hidden">
+        <div class="s2-hero">
+          🧑🏾
+          <div class="s2-back">←</div>
+          <div class="s2-badges">
+            <span class="s2-badge v">✓ Verified</span>
+            <span class="s2-badge">Background checked</span>
+          </div>
+        </div>
+        <div class="s2-main">
+          <div class="s2-name">Marcus T.</div>
+          <div class="s2-title">Handyman · East Austin</div>
+          <div class="s2-stats">
+            <div class="s2-stat">
+              <div class="s2-sval gold">4.9</div>
+              <div class="s2-slbl">Rating</div>
+            </div>
+            <div class="s2-stat">
+              <div class="s2-sval">127</div>
+              <div class="s2-slbl">Jobs done</div>
+            </div>
+            <div class="s2-stat">
+              <div class="s2-sval green">$45</div>
+              <div class="s2-slbl">Per hour</div>
+            </div>
+          </div>
+          <div class="s2-bio">Former general contractor turned gig worker. I love fixing things — from leaky faucets to flat-pack furniture. Fast, clean, and I always tidy up.</div>
+          <div class="s2-skills">
+            <span class="s2-chip">🔧 General repairs</span>
+            <span class="s2-chip">🚿 Plumbing</span>
+            <span class="s2-chip">⚡ Electrical</span>
+            <span class="s2-chip">🪚 Carpentry</span>
+            <span class="s2-chip">🛋️ Assembly</span>
+          </div>
+          <div class="s2-review">
+            <div class="s2-rh">
+              <span class="s2-rav">👤</span>
+              <span class="s2-rn">Tyler B.</span>
+              <span class="s2-rd">2 days ago</span>
+            </div>
+            <div class="s2-rs">★★★★★</div>
+            <div class="s2-rt">"Fixed my garbage disposal and patched drywall in 2 hours. Already booked him again."</div>
+          </div>
+          <div class="s2-bookbtn">Book Marcus — $45/hr →</div>
+        </div>
+      </div>
+
+      <div class="bnav">
+        <div class="bnav-item"><span>🏠</span>Home</div>
+        <div class="bnav-item active"><span>🔍</span>Browse</div>
+        <div class="bnav-item"><span>📋</span>My Jobs</div>
+        <div class="bnav-item"><span>👤</span>Profile</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREENSHOT 3: Booking ── -->
+  <div class="shot-wrap">
+    <div class="shot-label">3 — Book Instantly</div>
+    <div class="iphone">
+      <div class="sbar">
+        <span>9:41</span>
+        <div class="sbar-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+
+      <div class="mkt-banner bottom" style="bottom:94px;background:linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.95) 60%, transparent 100%);padding:20px 0 20px">
+        <div class="mkt-pill blue">Instant Booking</div>
+        <div class="headline">Zero forms.<br/><em>Zero friction.</em></div>
+        <div class="sub-headline">Review the details, confirm, and your worker is on the way. That's it.</div>
+      </div>
+
+      <div class="s3" style="position:absolute;inset:0;overflow:hidden">
+        <div class="s3-header">
+          <div class="s3-back">←</div>
+          <div class="s3-htitle">Confirm Booking</div>
+        </div>
+
+        <div class="s3-wcard">
+          <div class="s3-wav">🧑🏾</div>
+          <div class="s3-winfo">
+            <div class="s3-wname">Marcus T.</div>
+            <div class="s3-wsub">Handyman · ⭐ 4.9 · 127 jobs</div>
+          </div>
+          <div class="s3-wrate">$45/hr</div>
+        </div>
+
+        <div class="s3-addr">
+          <div class="s3-albl">📍 Job Location</div>
+          <div class="s3-aval">2847 East 6th St, Austin, TX</div>
+        </div>
+
+        <div class="s3-details">
+          <div class="s3-dlbl">Job Details</div>
+          <div class="s3-drow">
+            <span class="s3-dleft">Duration estimate</span>
+            <span class="s3-dright">2 hours</span>
+          </div>
+          <div class="s3-drow">
+            <span class="s3-dleft">Rate</span>
+            <span class="s3-dright">$45/hr</span>
+          </div>
+          <div class="s3-drow">
+            <span class="s3-dleft">Platform fee (18%)</span>
+            <span class="s3-dright">$16.20</span>
+          </div>
+          <div class="s3-drow">
+            <span class="s3-dleft">Estimated total</span>
+            <span class="s3-dright big">$106.20</span>
+          </div>
+          <div class="s3-drow">
+            <span class="s3-dleft">Estimated arrival</span>
+            <span class="s3-dright green">~12 min</span>
+          </div>
+        </div>
+
+        <div class="s3-note">You're only charged after the job is complete. Cancel anytime before arrival for free.</div>
+
+        <div class="s3-cbtn">Confirm &amp; Book →</div>
+      </div>
+
+      <div class="bnav">
+        <div class="bnav-item"><span>🏠</span>Home</div>
+        <div class="bnav-item active"><span>🔍</span>Browse</div>
+        <div class="bnav-item"><span>📋</span>My Jobs</div>
+        <div class="bnav-item"><span>👤</span>Profile</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREENSHOT 4: En Route ── -->
+  <div class="shot-wrap">
+    <div class="shot-label">4 — Worker En Route</div>
+    <div class="iphone">
+      <div class="sbar">
+        <span>9:41</span>
+        <div class="sbar-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+
+      <div class="mkt-banner bottom" style="bottom:94px;background:linear-gradient(to top, rgba(10,10,10,1) 0%, rgba(10,10,10,0.95) 60%, transparent 100%);padding:20px 0 20px">
+        <div class="mkt-pill blue">Live Tracking</div>
+        <div class="headline">Watch them<br/><em>roll up.</em></div>
+        <div class="sub-headline">Real-time ETA, live map, direct chat — you're always in the loop.</div>
+      </div>
+
+      <div class="s4" style="position:absolute;inset:0;overflow:hidden">
+        <div class="s4-map">
+          <div class="s4-grid"></div>
+          <div class="s4-worker-dot">🧑🏾</div>
+          <div class="s4-you-dot"></div>
+          <div class="s4-pin">📍</div>
+        </div>
+
+        <div class="s4-info">
+          <div class="s4-slbl">East 6th St, Austin TX</div>
+          <div class="s4-stitle">Marcus is on the way</div>
+        </div>
+
+        <div class="s4-eta">
+          <div>
+            <div class="s4-eta-lbl">Arrives in</div>
+            <div class="s4-eta-time">11<span style="font-size:22px;font-weight:600">min</span></div>
+            <div class="s4-eta-sub">0.8 miles away</div>
+          </div>
+          <div class="s4-worker">
+            <div class="s4-wav">🧑🏾</div>
+            <div class="s4-wname">Marcus T.</div>
+            <div class="s4-wrating">⭐ 4.9</div>
+          </div>
+        </div>
+
+        <div class="s4-actions">
+          <div class="s4-abtn">
+            <div class="s4-abtn-icon">💬</div>
+            <div class="s4-abtn-lbl">Message</div>
+          </div>
+          <div class="s4-abtn">
+            <div class="s4-abtn-icon">📞</div>
+            <div class="s4-abtn-lbl">Call</div>
+          </div>
+          <div class="s4-abtn">
+            <div class="s4-abtn-icon">✕</div>
+            <div class="s4-abtn-lbl">Cancel</div>
+          </div>
+        </div>
+
+        <div class="s4-job-summary">
+          <div class="s4-jlbl">Booked Job</div>
+          <div class="s4-jrow">🔧 Handyman · 2 hrs · Est. <strong>$106.20</strong></div>
+          <div class="s4-jrow">📍 2847 East 6th St, Austin TX</div>
+        </div>
+      </div>
+
+      <div class="bnav">
+        <div class="bnav-item active"><span>🏠</span>Home</div>
+        <div class="bnav-item"><span>🔍</span>Browse</div>
+        <div class="bnav-item"><span>📋</span>My Jobs</div>
+        <div class="bnav-item"><span>👤</span>Profile</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SCREENSHOT 5: Work Mode Ping ── -->
+  <div class="shot-wrap">
+    <div class="shot-label">5 — Work Mode</div>
+    <div class="iphone">
+      <div class="sbar">
+        <span>9:41</span>
+        <div class="sbar-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+      </div>
+
+      <div class="mkt-banner top" style="top:62px;background:linear-gradient(to bottom, rgba(10,10,10,1) 0%, rgba(10,10,10,0.9) 50%, transparent 100%);padding:20px 0 30px">
+        <div class="mkt-pill green">Work Mode</div>
+        <div class="headline">Pick up jobs.<br/><em>Get paid fast.</em></div>
+        <div class="sub-headline">Accept or decline in seconds. Your money, your schedule.</div>
+      </div>
+
+      <div class="s5" style="position:absolute;inset:0;overflow:hidden">
+        <!-- empty space for overlay above -->
+        <div style="height:220px"></div>
+
+        <div style="display:flex;justify-content:center;margin-bottom:20px">
+          <div class="s5-ring">
+            <svg width="110" height="110" viewBox="0 0 110 110">
+              <circle cx="55" cy="55" r="46" fill="none" stroke="#1e1e1e" stroke-width="9"/>
+              <circle cx="55" cy="55" r="46" fill="none" stroke="#FF5C00" stroke-width="9"
+                stroke-dasharray="289.3" stroke-dashoffset="96"
+                stroke-linecap="round"/>
+            </svg>
+            <div class="num">20</div>
+          </div>
+        </div>
+
+        <div class="s5-job">
+          <div class="s5-jtop">
+            <div class="s5-jemoji">🍸</div>
+            <div class="s5-jinfo">
+              <div class="s5-jtype">Event Bartender</div>
+              <div class="s5-jaddr">📍 1408 Kenwood Ave, Austin</div>
+            </div>
+            <div class="s5-jpay">
+              <div class="s5-jamt">$165</div>
+              <div class="s5-jest">est. 3 hrs</div>
+            </div>
+          </div>
+          <div class="s5-jrow">
+            <div class="s5-jd">
+              <div class="s5-jdlbl">Duration</div>
+              <div class="s5-jdval">~3 hours</div>
+            </div>
+            <div class="s5-jd">
+              <div class="s5-jdlbl">Distance</div>
+              <div class="s5-jdval">0.6 mi</div>
+            </div>
+            <div class="s5-jd">
+              <div class="s5-jdlbl">Start</div>
+              <div class="s5-jdval">Now</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s5-actions">
+          <div class="s5-decline">Decline</div>
+          <div class="s5-accept">✓ Accept</div>
+        </div>
+      </div>
+
+      <div class="bnav">
+        <div class="bnav-item active"><span>🏠</span>Home</div>
+        <div class="bnav-item"><span>🔔</span>Jobs</div>
+        <div class="bnav-item"><span>💳</span>Earnings</div>
+        <div class="bnav-item"><span>👤</span>Profile</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .gallery -->
+
+</body>
+</html>

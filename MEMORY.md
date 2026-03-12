@@ -23,39 +23,82 @@
 - **Local copy:** `/home/node/.openclaw/workspace/propath/index.html`
 - Push via: `git push https://<token>@github.com/dinbotgang/propath-website.git main`
 
-## Polymarket Spread-Arb Bot
+## Polymarket Esports Betting Bot
 
-**Created:** 2026-02-25
+**Created:** 2026-02-25 | **Last updated:** 2026-03-10
 
 ### What It Is
-A spread-arbitrage bot that buys YES+NO on the same Polymarket binary market simultaneously, targeting the bid-ask spread. Runs on Hetzner VPS at `178.156.248.17`.
+An **esports betting bot** on Polymarket. Monitors live **Valorant (VCT), CS2, and Dota2** matches via VLR.gg API, detects in-game events (pistol wins, eco wins, map wins, economy swings, barracks fall, kill streaks, etc.) and places directional trades on Polymarket. Runs on Hetzner VPS at `178.156.248.17`.
+
+**Source files:** `/root/polymarket-bot/src/` — `valorant.ts`, `cs2.ts`, `dota2.ts`, `server.ts`, `trader.ts`
 
 ### Critical Config
-- **Bot path:** `/root/polymarket-bot/` (source: `src/server.ts`, `src/trader.ts`)
+- **Bot path:** `/root/polymarket-bot/` (source: `src/server.ts`, `src/trader.ts`, `src/dota2.ts`, `src/cs2.ts`)
 - **Dashboard:** `http://178.156.248.17:8080`
-- **Proxy (Germany geoblock bypass):** `http://lsuysski:zsuzuo6md8b7@142.111.67.146:5611`
+- **Proxy (Switzerland - Zurich, geoblock bypass):** `http://lsuysski:zsuzuo6md8b7@191.101.121.193:6467`
+  - VPS is in Virginia (US) — cannot access Polymarket esports markets without proxy
+  - Proxy used ONLY for Polymarket API calls, not system-wide (NordVPN warning still applies)
 - **Funder wallet:** `0xf30aaAf3B1ADaa5FCfA941891C8c4e05174B6884`
 - **Signer:** `0xc6CD220D744e3CCc7195e544cFf5C27FEc6c59dE`
-- **Account slug:** `0xf30aaAf3B1ADaa5FCfA941891C8c4e05174B6884-1771971337765`
+- **State file:** `/root/polymarket-bot/data/esports_state.json`
+- **Lockfile:** `/tmp/polymarket-bot.lock` (canonical — do not change)
 
 ### Start / Kill
 ```bash
-# Start
-rm -f /tmp/polymarket-bot.lock
-nohup /root/polymarket-bot/run.sh > /tmp/polymarket-bot.log 2>&1 &
+# Start / Stop / Restart — use systemd (NOT nohup manually)
+systemctl start polymarket-bot
+systemctl stop polymarket-bot
+systemctl restart polymarket-bot
+systemctl status polymarket-bot
 
-# Kill
-kill -9 $(ps aux | grep run.sh | grep -v grep | awk '{print $2}')
-kill $(lsof -ti:8080)
-rm -f /tmp/polymarket-bot.lock
+# Logs
+tail -f /tmp/polymarket-bot.log
 ```
+⚠️ DO NOT use `nohup bash run.sh` manually — systemd service (`polymarket-bot.service`) manages the bot. Running manually creates a competing process because systemd's `Restart=always` (RestartSec=5) will keep trying to start and fail the flock, spamming "Bot already running" into the log.
 
-### Key Parameters
-- `sizePerSide = 5` USDC (min $10/pair)
-- Balance threshold: $9.80 (sizePerSide*2 - 0.20)
-- Market filter: 2–14 days to expiry, price 0.08–0.92, vol24h ≥ $30k, spread ≥ 3%
-- Stale order rotation: every 2 min, cancel BUY orders open > 5 min
-- PID lock: `/tmp/polymarket-bot.lock`
+### Key Parameters & Architecture
+- **`calcSize(price)`** — helper in `server.ts`: always returns **6 tokens** (flat). CLOB `size` param = TOKEN count, NOT USDC — critical gotcha! Sending USDC as token count caused all low-price orders to fail (e.g. price 0.225 → $1.35 USDC sent as 1.35 tokens → rejected). 6 tokens costs $price*6 USDC, always above Polymarket's 5-share sell minimum
+- **`TRADE_SIZE_USDC`** — configured to $1, but `calcSize` overrides upward when needed
+- **`pendingGameIds`** — Set that locks a gameId the moment a signal fires (before async order), preventing duplicate trades
+- **CLOB `createAndPostOrder` size** — size param is in **TOKEN units** (not USDC). For BUY: `size * price = USDC spent`. Common gotcha!
+- **Minimum order sizes on Polymarket:** BUY = $1 USDC minimum; SELL = 5 shares minimum
+- **Dota 2 spectator filter:** `MIN_DOTA2_SPECTATORS=5` (set in .env) — skips 0-viewer pub games, tracks anything with at least 5 spectators
+- **Auto-approve:** `ensureCollateralAllowance()` before BUY, `ensureConditionalAllowance()` + fresh `updateBalanceAllowance()` before every SELL
+- **Market matching:** `findMarketForTeams()` requires BOTH team names to have a unique word match (stopwords: team, gaming, esports, club, the, and)
+- **Polymarket tag slugs (CRITICAL):** CS2 markets use BOTH `counter-strike` AND `counter-strike-2` tags. Must query both or ~30% of CS2 markets are missed. Current slug list: `['esports', 'dota-2', 'counter-strike', 'counter-strike-2', 'valorant', 'league-of-legends']`
+
+### Grid.gg API (replaces PandaScore — 2026-03-11)
+- **API Key:** `ZD00KtvLrCENS95kbG9TL3B0YSpAlAtCtxiJEM5c`
+- **Stored in:** `/root/polymarket-bot/.env` as `GRID_API_KEY`
+- **Intended use:** CS2 (and potentially Valorant/LoL) live match data
+- **Status:** Key authenticates (x-api-key header) but gets PERMISSION_DENIED on live data feed endpoints — likely needs premium/enterprise plan activated by Grid.gg for live CS2 game state access
+- **Central Data GraphQL:** `https://api.grid.gg/central-data/graphql`
+- **Live Data Feed:** `https://api.grid.gg/live-data-feed/series-state` (requires elevated permissions)
+- **PandaScore removed** — was used for Valorant live data, now gone from `.env`
+
+### Active Games (User Preference — 2026-03-10)
+- **LoL:** ✅ ENABLED
+- **Dota 2:** ✅ ENABLED
+- **CS2:** ❌ DISABLED (user preference — `pollCS2()` commented out in server.ts)
+- **Valorant:** ❌ DISABLED (user preference — VCT matches filtered out in `getLiveMatches()`)
+
+### CS2 Status
+- Infrastructure built (`src/cs2.ts`) with HLTV scorebot WebSocket for real-time round data
+- **Blocked:** HLTV.org is Cloudflare-protected — `getLiveMatches()` fails with Access Denied
+- **Fix (TODO):** Use a scraping API for match discovery, scorebot WebSocket is fine for live data
+- **Currently disabled by user preference**
+
+### Telegram Trade Notifications
+- Set up via `HEARTBEAT.md` — checks `data/esports_state.json` on each heartbeat
+- State tracked in `memory/bot-trade-state.json` (notifiedIds array)
+- Sends entry reason on open, PnL on close
+- Cost guard: if daily spend > $3 on notifications, auto-disables and alerts George
+
+### Hard-Won Lessons
+- **Duplicate trades:** Fixed with `pendingGameIds` Set — add before placeOrder, remove after push/fail
+- **Partial close:** If position has < 5 shares, can't sell. Top-up approach: buy more shares, but be careful — `size` is tokens not USDC, and min buy is $1 USDC. To avoid: always use `calcSize` with 6 share minimum
+- **"delayed" orders:** Polymarket CLOB returns `status: "delayed"` for accepted orders — need to poll balance to confirm fill, not just check response
+- **Conditional allowance:** Must call `updateBalanceAllowance({ asset_type: CONDITIONAL, token_id })` before every SELL, not just once
 
 ### Polymarket PnL API (Hard-Won Knowledge)
 - Dedicated portfolio endpoints (`/portfolio`, `/portfolio/value`, etc.) all return 404
@@ -77,6 +120,47 @@ DO NOT use NordVPN system-wide on the VPS — it reroutes all traffic including 
 - `data/pnl.json` — PnL store: `{closedPnl, lastAssets, snapshots[]}`
 - `.env` — PK, FUNDER_ADDRESS, PORT=8080, SOCKS5_PROXY
 - `run.sh` — auto-restart loop with 5s cooldown
+
+## On Call App
+
+**Created:** 2026-03-11
+
+### What It Is
+A two-sided marketplace app concept — Uber meets Hinge for contract work (handymen, bartenders, movers, lawn care, etc.). Austin TX beta target. Concept docs at `/home/node/.openclaw/workspace/on-call/`.
+
+### Assets Built
+- `on-call/CONCEPT.md` — full concept, categories, UX flows, business model
+- `on-call/landing/index.html` — marketing landing page
+- `on-call/app-store/index.html` — 5 App Store screenshot mockups (iPhone 14 Pro, dark theme)
+- `on-call/demo/index.html` — interactive web demo (not hosted)
+
+### React Native App
+- **Location:** `/home/node/.openclaw/workspace/on-call/rn/`
+- **Stack:** Expo SDK 54, React Navigation (stack + bottom tabs), `@expo/vector-icons` Ionicons, custom Avatar component
+- **Theme:** dark (`#0a0a0a` bg), accent orange `#FF5C00`, hire blue `#3B82F6`, work green `#22c55e`
+
+#### Screens
+- **ModeSelect** — entry, choose Hire or Work mode
+- **Hire:** HireHome → WorkerList → WorkerProfile → BookingConfirm → ActiveJob
+- **Work:** WorkHome → JobPing → JobNavigation → JobComplete
+- Placeholders: MyJobs, HireProfile, Earnings, WorkProfile, Jobs
+
+#### Key components
+- `src/components/Avatar.js` — colored initials circles, hash-based palette per name (no emoji faces)
+- `src/theme.js` — design tokens
+
+#### Running the dev server
+```bash
+cd /home/node/.openclaw/workspace/on-call/rn
+npx expo start --tunnel --port 8082
+```
+- User tests via **Expo Go** on iPhone — no Apple Dev account needed
+- Tunnel URL changes on restart; check ngrok: `curl -s http://localhost:4040/api/tunnels`
+- Compatible with **Expo Go SDK 54** (App Store version as of 2026-03-11)
+
+#### Notes
+- Do NOT use emojis for icons — all replaced with Ionicons + Avatar initials
+- SafeAreaView deprecation warning is cosmetic only
 
 ## TikTok Video Pipeline
 
